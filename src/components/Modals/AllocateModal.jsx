@@ -14,22 +14,32 @@ export default function AllocateModal({ sample, isOpen, onClose }) {
   const filteredEngineers = engineers.filter(e => e.section === selectedSection);
 
   useEffect(() => {
-    if (filteredEngineers.length > 0) {
-      setSelectedEng(filteredEngineers[0].name);
-    } else {
-      setSelectedEng('');
-    }
-  }, [selectedSection]);
-
-  useEffect(() => {
-    if (sample) {
-      setSelectedSection(sample.testingSection || 'Mechanical');
+    if (sample && isOpen) {
+      const sec = sample.testingSection || 'Mechanical';
+      setSelectedSection(sec);
       setPriority(sample.priority || 'Medium');
       const defaultDate = new Date();
       defaultDate.setDate(defaultDate.getDate() + 14);
       setDueDate(sample.dueDate || defaultDate.toISOString().split('T')[0]);
+      
+      const secEngineers = engineers.filter(e => e.section === sec);
+      if (secEngineers.length > 0) {
+        setSelectedEng(secEngineers[0].name);
+      } else {
+        setSelectedEng('');
+      }
     }
-  }, [sample]);
+  }, [sample, isOpen, engineers]);
+
+  const handleSectionChange = (newSec) => {
+    setSelectedSection(newSec);
+    const secEngineers = engineers.filter(e => e.section === newSec);
+    if (secEngineers.length > 0) {
+      setSelectedEng(secEngineers[0].name);
+    } else {
+      setSelectedEng('');
+    }
+  };
 
   if (!isOpen || !sample) return null;
 
@@ -81,7 +91,7 @@ export default function AllocateModal({ sample, isOpen, onClose }) {
             <label className="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Testing Section</label>
             <select
               value={selectedSection}
-              onChange={(e) => setSelectedSection(e.target.value)}
+              onChange={(e) => handleSectionChange(e.target.value)}
               className="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-800 dark:text-slate-100 font-medium focus:ring-1 focus:ring-indigo-500 focus:outline-none bg-white dark:bg-slate-800"
             >
               {sections.map(sec => (

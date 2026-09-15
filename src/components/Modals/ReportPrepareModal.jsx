@@ -12,14 +12,14 @@ export default function ReportPrepareModal({ sample, isOpen, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (sample) {
+    if (sample && isOpen) {
       const randomId = Math.floor(1000 + Math.random() * 9000);
-      setReportNo(`REP-${new Date().getFullYear()}-${randomId}`);
+      setReportNo(sample.reportNumber || `REP-${new Date().getFullYear()}-${randomId}`);
       if (reportingManagers.length > 0) {
         setSelectedRm(reportingManagers[0].name);
       }
     }
-  }, [sample, reportingManagers]);
+  }, [sample, isOpen, reportingManagers]);
 
   if (!isOpen || !sample) return null;
 

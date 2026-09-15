@@ -57,8 +57,12 @@ function AppContent() {
 
     if (selectedRole === 'Reporting Manager') {
       if (view === 'Admin') return false;
-      if (view === 'Sample Handling' && !['Create Sample', 'Reports Pending', 'Amended Reports Pending', 'Final Reports'].includes(subView)) return false;
+      if (view === 'Sample Handling' && !['Reports Pending', 'Amended Reports Pending', 'Final Reports'].includes(subView)) return false;
       return true;
+    }
+
+    if (selectedRole !== 'Sample Cell' && subView === 'Create Sample') {
+      return false;
     }
 
     return true;

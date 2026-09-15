@@ -62,7 +62,6 @@ export default function Sidebar({ currentView, setCurrentView, currentSubView, s
       // PDF Doc 1 Page 7 & 16
       const engSamples = samples.filter(s => s.assignedEngineer === selectedEngineer);
       return [
-        { name: 'Create Sample', count: 0 },
         { name: 'Sample Receipt', count: engSamples.filter(s => ['Samples Allocated', 'Allocated', 'New Sample Received'].includes(s.status)).length },
         { name: 'Pending Samples', count: engSamples.filter(s => ['Accepted', 'Pending', 'Testing In Progress'].includes(s.status)).length },
         { name: 'Issued Test Report', count: engSamples.filter(s => ['Test Results Pending Verification', 'Reports Pending', 'Amended Reports Pending', 'Final Reports Pending', 'Sent to Sample Cell', 'Testing Completed'].includes(s.status) || s.verificationStatus === 'Verified').length }
@@ -85,7 +84,6 @@ export default function Sidebar({ currentView, setCurrentView, currentSubView, s
     } else if (selectedRole === 'Reporting Manager') {
       // PDF Doc 2 Page 7 & 14
       return [
-        { name: 'Create Sample', count: 0 },
         { name: 'Reports Pending', count: samples.filter(s => s.status === 'Reports Pending' || s.status === 'Test Results Pending Verification').length },
         { name: 'Amended Reports Pending', count: samples.filter(s => s.status === 'Amended Reports Pending').length },
         { name: 'Final Reports', count: samples.filter(s => s.status === 'Sent to Sample Cell' || s.status === 'Testing Completed').length }
@@ -93,7 +91,6 @@ export default function Sidebar({ currentView, setCurrentView, currentSubView, s
     } else {
       // Technical Manager & Admin strictly matching specifications
       return [
-        { name: 'Create Sample', count: 0 },
         { name: 'New Sample Received', count: samples.filter(s => s.status === 'New Sample Received' && (s.type === 'New' || !s.type)).length },
         { name: 'Supplementary Sample Received', count: samples.filter(s => s.status === 'Supplementary Sample Received' || (s.type === 'Supplementary' && s.status === 'New Sample Received')).length },
         { name: 'Amended Sample Received', count: samples.filter(s => s.status === 'Amended Sample Received' || (s.type === 'Amended' && s.status === 'New Sample Received')).length },

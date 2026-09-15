@@ -20,7 +20,7 @@ import { useWorkflow } from '../../context/WorkflowContext';
 import GenerateTestRequestModal from '../Modals/GenerateTestRequestModal';
 import ViewDetailsModal from '../Modals/ViewDetailsModal';
 
-export default function SampleCellDashboardView({ navToSubView }) {
+export default function SampleCellDashboardView({ setCurrentView, setCurrentSubView, navToSubView }) {
   const { 
     samples, 
     series, 
@@ -61,8 +61,9 @@ export default function SampleCellDashboardView({ navToSubView }) {
 
   // 2. CARD CLICK & ROUTING STATE MAP
   const navToRoute = (view, subView, hashRoute) => {
-    setCurrentView(view);
-    setCurrentSubView(subView);
+    if (setCurrentView) setCurrentView(view);
+    if (setCurrentSubView) setCurrentSubView(subView);
+    if (navToSubView) navToSubView(subView);
     window.location.hash = hashRoute;
   };
 
