@@ -23,9 +23,12 @@ export default function MobileBottomNav({ currentView, onNavigate }) {
         const active = currentView === item.id;
         return (
           <button
+            type="button"
             key={item.id}
             onClick={() => onNavigate(item.id)}
-            className={`relative flex flex-col items-center gap-1 px-3 py-1 rounded-md transition-colors ${
+            aria-label={`Navigate to ${item.label}`}
+            aria-current={active ? 'page' : undefined}
+            className={`relative flex flex-col items-center gap-1 px-3 py-1 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:outline-none ${
               active 
                 ? 'text-yellow-500 font-bold' 
                 : 'hover:text-slate-200 text-slate-400'

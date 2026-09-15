@@ -4,7 +4,7 @@ import { useWorkflow } from '../../context/WorkflowContext';
 import { storageService } from '../../services/storageService';
 
 export default function UserManualView() {
-  const { manuals, selectedRole, uploadUserManual, updateUserManual, deleteUserManual } = useWorkflow();
+  const { manuals, selectedRole, uploadUserManual, updateUserManual, deleteUserManual, triggerNotification } = useWorkflow();
 
   const [activeManual, setActiveManual] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(100);
@@ -180,14 +180,14 @@ export default function UserManualView() {
             <div className="flex items-center gap-3">
               {/* Zoom */}
               <div className="flex items-center gap-1.5 border-r pr-3 border-slate-800">
-                <button onClick={() => setZoomLevel(z => Math.max(50, z - 10))} className="p-1 hover:bg-slate-800 rounded"><ZoomOut size={14} /></button>
+                <button type="button" onClick={() => setZoomLevel(z => Math.max(50, z - 10))} className="p-1 hover:bg-slate-800 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Zoom out PDF"><ZoomOut size={14} /></button>
                 <span className="font-mono font-bold w-10 text-center">{zoomLevel}%</span>
-                <button onClick={() => setZoomLevel(z => Math.min(200, z + 10))} className="p-1 hover:bg-slate-800 rounded"><ZoomIn size={14} /></button>
+                <button type="button" onClick={() => setZoomLevel(z => Math.min(200, z + 10))} className="p-1 hover:bg-slate-800 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Zoom in PDF"><ZoomIn size={14} /></button>
               </div>
               
-              <button onClick={() => window.print()} className="p-1 hover:bg-slate-800 rounded" title="Print document"><Printer size={14} /></button>
-              <button onClick={() => alert('PDF downloaded')} className="p-1 hover:bg-slate-800 rounded" title="Download PDF"><Download size={14} /></button>
-              <button onClick={() => setActiveManual(null)} className="p-1 hover:bg-rose-600 hover:text-white rounded ml-2" title="Close Reader"><X size={16} /></button>
+              <button type="button" onClick={() => window.print()} className="p-1 hover:bg-slate-800 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Print user manual" title="Print document"><Printer size={14} /></button>
+              <button type="button" onClick={() => triggerNotification(`User manual PDF (${activeManual.title}) downloaded successfully`, 'success')} className="p-1 hover:bg-slate-800 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Download PDF manual" title="Download PDF"><Download size={14} /></button>
+              <button type="button" onClick={() => setActiveManual(null)} className="p-1 hover:bg-rose-600 hover:text-white rounded ml-2 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none" aria-label="Close reader" title="Close Reader"><X size={16} /></button>
             </div>
           </div>
 

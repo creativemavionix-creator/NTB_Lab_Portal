@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { X, FileText, Calendar, UserCheck, CheckCircle2, Clock, AlertTriangle, Layers, Download, CheckSquare } from 'lucide-react';
+import { X, FileText, Download } from 'lucide-react';
+import { useWorkflow } from '../../context/WorkflowContext';
 
-export default function ViewDetailsModal({ sample, isOpen, onClose, onAction }) {
+export default function ViewDetailsModal({ sample, isOpen, onClose, _onAction }) {
+  const { triggerNotification } = useWorkflow();
   const [activeTab, setActiveTab] = useState('metadata');
 
   if (!isOpen || !sample) return null;
@@ -32,8 +34,8 @@ export default function ViewDetailsModal({ sample, isOpen, onClose, onAction }) 
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-xs p-4 font-sans">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-300 text-slate-800 text-xs">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 pt-3 sm:pt-4 bg-slate-950/75 backdrop-blur-xs font-sans overflow-y-auto" role="dialog" aria-modal="true" aria-label="Sample Details Dialog">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-4xl max-h-[94vh] sm:max-h-[90vh] my-0 sm:my-auto flex flex-col overflow-hidden border border-slate-300 text-slate-800 text-xs">
         
         {/* Header */}
         <div className="bg-[#1e293b] text-white p-4 flex items-center justify-between border-b border-slate-800">
@@ -230,7 +232,12 @@ export default function ViewDetailsModal({ sample, isOpen, onClose, onAction }) 
                 <p className="text-slate-900 font-semibold">{sample.testResults || 'Sample passed hydrostatic pressure limit test at 3.0 kg/cm² without seepage or deformation.'}</p>
                 <div className="flex items-center gap-3 pt-2">
                   <span className="font-bold text-slate-700">Report Certificate Number: <span className="text-[#1e3a8a]">{sample.reportNumber || `REP-2026-${sample.id}`}</span></span>
-                  <button onClick={() => alert('Downloading official PDF certificate')} className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-xs flex items-center gap-1 cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={() => triggerNotification(`Downloading official PDF certificate (${sample.reportNumber || sample.id}).pdf`, 'success')}
+                    className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-xs flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"
+                    aria-label={`Download official PDF certificate for ${sample.id}`}
+                  >
                     <Download size={13} />
                     <span>Download Final PDF</span>
                   </button>

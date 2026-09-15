@@ -9,6 +9,7 @@ export default function ReportPrepareModal({ sample, isOpen, onClose }) {
   const [selectedRm, setSelectedRm] = useState('');
   const [remarks, setRemarks] = useState('');
   const [previewMode, setPreviewMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (sample) {
@@ -22,20 +23,26 @@ export default function ReportPrepareModal({ sample, isOpen, onClose }) {
 
   if (!isOpen || !sample) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!reportNo.trim()) return alert('Please enter a valid Report Number.');
+  const handleSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!reportNo.trim()) return triggerNotification('Please enter a valid Report Number.', 'warning');
     
-    prepareReport(sample.id, reportNo, selectedRm);
-    
-    triggerNotification(`Final Report Prepared: ${reportNo}`, 'success');
-    onClose();
-    setPreviewMode(false);
+    try {
+      setIsSubmitting(true);
+      await prepareReport(sample.id, reportNo, selectedRm);
+      triggerNotification(`Final Report Prepared: ${reportNo}`, 'success');
+      onClose();
+      setPreviewMode(false);
+    } catch (err) {
+      triggerNotification(`Failed to prepare report: ${err.message || 'Unknown error'}`, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors my-8">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 pt-3 sm:pt-4 bg-slate-950/75 backdrop-blur-xs font-sans overflow-y-auto animate-fade-in" role="dialog" aria-modal="true" aria-label="Prepare Test Report Dialog">
+      <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white border-b border-slate-800">
@@ -43,7 +50,7 @@ export default function ReportPrepareModal({ sample, isOpen, onClose }) {
             <FileText size={16} className="text-yellow-500" />
             {previewMode ? 'Certificate Preview & Sign-Off' : 'Prepare Test Report Certificate'}
           </h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded">
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Close report prepare modal">
             <X size={18} />
           </button>
         </div>
@@ -196,10 +203,20 @@ export default function ReportPrepareModal({ sample, isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-bold flex items-center gap-1.5 shadow-2xs"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-400 text-white rounded-lg font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none"
                 >
-                  <Send size={14} />
-                  Approve and Sign Certificate
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Signing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={14} />
+                      <span>Approve and Sign Certificate</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

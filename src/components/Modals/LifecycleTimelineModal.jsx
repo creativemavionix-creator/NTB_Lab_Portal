@@ -56,8 +56,8 @@ export default function LifecycleTimelineModal({ isOpen, sample, onClose }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
-      <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col transition-colors">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 pt-3 sm:pt-4 bg-slate-950/75 backdrop-blur-xs font-sans overflow-y-auto animate-fade-in" role="dialog" aria-modal="true" aria-label="Lifecycle Timeline Audit Dialog">
+      <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh] transition-colors">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white border-b border-slate-800">
@@ -67,7 +67,7 @@ export default function LifecycleTimelineModal({ isOpen, sample, onClose }) {
               Sample Code: <span className="font-mono text-yellow-400">{sample.id}</span>
             </h3>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded">
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Close lifecycle timeline modal">
             <X size={20} />
           </button>
         </div>
@@ -127,8 +127,9 @@ export default function LifecycleTimelineModal({ isOpen, sample, onClose }) {
         {/* Modal Footer */}
         <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex justify-end">
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded font-bold text-xs"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded font-bold text-xs focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
           >
             Close Audit
           </button>

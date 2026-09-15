@@ -5,8 +5,6 @@ import { samplesService } from '../services/samplesService';
 import { clarificationsService } from '../services/clarificationsService';
 import { manualsService } from '../services/manualsService';
 import { logsService } from '../services/logsService';
-import { authService } from '../services/authService';
-import { storageService } from '../services/storageService';
 
 const WorkflowContext = createContext();
 
@@ -1674,7 +1672,7 @@ export const WorkflowProvider = ({ children }) => {
     }
   });
   
-  const [engineers] = useState(INITIAL_ENGINEERS);
+  const [baseEngineers] = useState(INITIAL_ENGINEERS);
   const [oics] = useState(INITIAL_OICS);
   const [reportingManagers] = useState(INITIAL_REPORTING_MANAGERS);
   const [sections] = useState(INITIAL_SECTIONS);
@@ -1852,10 +1850,9 @@ export const WorkflowProvider = ({ children }) => {
   };
 
   const addSample = async (sampleData) => {
-    const newId = `${Math.floor(25 + Math.random() * 50)}M${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+    const newId = (sampleData.id && sampleData.id.trim()) ? sampleData.id.trim() : `${Math.floor(25 + Math.random() * 50)}M${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
     const today = new Date().toISOString().split('T')[0];
     const newSample = {
-      id: newId,
       dateReceived: today,
       forwardedOn: today,
       status: 'New Sample Received',
@@ -1877,7 +1874,8 @@ export const WorkflowProvider = ({ children }) => {
       reportingManager: null,
       type: sampleData.type || 'New',
       documents: ['Inward_Challan_Doc.pdf'],
-      ...sampleData
+      ...sampleData,
+      id: newId
     };
 
     setSamples(prev => [newSample, ...prev]);
@@ -2217,8 +2215,67 @@ export const WorkflowProvider = ({ children }) => {
     });
   };
 
-  const [series, setSeries] = useState(INITIAL_SERIES);
-  const [masterData] = useState(INITIAL_MASTER_DATA);
+  const [baseSeries] = useState(INITIAL_SERIES);
+  const series = baseSeries.map(ser => {
+    const keyword = (ser.product || '').split(' ')[0].toLowerCase();
+    const linked = samples.filter(s => (s.product || '').toLowerCase().includes(keyword));
+    if (linked.length === 0) return ser;
+    const completed = linked.filter(s => ['Sent to Sample Cell', 'Final Reports Pending', 'Testing Completed'].includes(s.status)).length;
+    const pending = Math.max(0, linked.length - completed);
+    let status = ser.status;
+    if (pending === 0 && completed > 0) status = 'Final Reports';
+    else if (completed > 0) status = 'Pending Reports';
+    else status = 'Pending Requests';
+    return {
+      ...ser,
+      sampleCount: linked.length,
+      completedReports: completed,
+      pendingReports: pending,
+      status
+    };
+  });
+
+  const [masterData, setMasterData] = useState(() => {
+    const saved = localStorage.getItem('ntb_master_data');
+    if (!saved) return INITIAL_MASTER_DATA;
+    try {
+      const parsed = JSON.parse(saved);
+      return typeof parsed === 'object' && parsed !== null ? { ...INITIAL_MASTER_DATA, ...parsed } : INITIAL_MASTER_DATA;
+    } catch (e) {
+      return INITIAL_MASTER_DATA;
+    }
+  });
+
+  useEffect(() => localStorage.setItem('ntb_master_data', JSON.stringify(masterData)), [masterData]);
+
+  const addMasterItem = (category, item) => {
+    if (!item || !item.trim()) return;
+    const cleanItem = item.trim();
+    setMasterData(prev => {
+      const currentList = prev[category] || [];
+      if (currentList.includes(cleanItem)) return prev;
+      return { ...prev, [category]: [...currentList, cleanItem] };
+    });
+    triggerNotification(`Added "${cleanItem}" to ${category}`, 'success');
+    addLog(`Admin added master data record "${cleanItem}" under ${category}.`);
+  };
+
+  const deleteMasterItem = (category, itemToDelete) => {
+    setMasterData(prev => {
+      const currentList = prev[category] || [];
+      return { ...prev, [category]: currentList.filter(i => i !== itemToDelete) };
+    });
+    triggerNotification(`Removed "${itemToDelete}" from ${category}`, 'warning');
+    addLog(`Admin deleted master data record "${itemToDelete}" from ${category}.`);
+  };
+
+  const engineers = baseEngineers.map(eng => {
+    const activeTasks = samples.filter(s =>
+      s.assignedEngineer === eng.name &&
+      !['Sent to Sample Cell', 'WITHDRAWN', 'Testing Completed'].includes(s.status)
+    ).length;
+    return { ...eng, activeTasks };
+  });
 
   // Sample Cell Workflow Actions
   const [sampleRequests, setSampleRequests] = useState(() => {
@@ -2356,6 +2413,7 @@ export const WorkflowProvider = ({ children }) => {
       addSample, allocateSample, acceptSample, startTesting, submitTestResults, verifyTestResults, approveAmendedReport, returnReportForCorrection,
       acceptSampleCell, forwardSampleCell, generateTestRequest, handleDispute, resolveDispute, handleReturnRequest, handleDiscardRequest, approveReturnRequest, rejectReturnRequest, approveDiscardRequest, rejectDiscardRequest, withdrawSample,
       raiseClarification, respondClarification, prepareReport, sendReportToSampleCell,
+      addMasterItem, deleteMasterItem,
       uploadUserManual, updateUserManual, deleteUserManual, getFilteredSamples, triggerNotification, addLog
     }}>
       {children}

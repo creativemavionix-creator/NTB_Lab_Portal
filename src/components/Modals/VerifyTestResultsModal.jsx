@@ -3,31 +3,49 @@ import { X, CheckCircle, RotateCcw, FileCheck, User, Calendar, FileText, Downloa
 import { useWorkflow } from '../../context/WorkflowContext';
 
 export default function VerifyTestResultsModal({ sample, isOpen, onClose }) {
-  const { verifyTestResults } = useWorkflow();
+  const { verifyTestResults, triggerNotification } = useWorkflow();
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [correctionRemarks, setCorrectionRemarks] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen || !sample) return null;
 
-  const handleVerify = () => {
-    verifyTestResults(sample.id, true);
-    onClose();
-    setShowReturnForm(false);
-    setCorrectionRemarks('');
+  const handleVerify = async () => {
+    try {
+      setIsSubmitting(true);
+      await verifyTestResults(sample.id, true);
+      triggerNotification(`Test results for sample ${sample.id} verified and sent to Reporting Queue`, 'success');
+      onClose();
+      setShowReturnForm(false);
+      setCorrectionRemarks('');
+    } catch (err) {
+      triggerNotification(`Failed to verify results: ${err.message || 'Unknown error'}`, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleReturnForCorrection = (e) => {
+  const handleReturnForCorrection = async (e) => {
     e.preventDefault();
-    if (!correctionRemarks.trim()) return alert('Please enter correction instructions for the engineer.');
-    verifyTestResults(sample.id, false, correctionRemarks);
-    onClose();
-    setShowReturnForm(false);
-    setCorrectionRemarks('');
+    if (!correctionRemarks.trim()) return triggerNotification('Please enter correction instructions for the engineer.', 'warning');
+    
+    try {
+      setIsSubmitting(true);
+      await verifyTestResults(sample.id, false, correctionRemarks);
+      triggerNotification(`Sample ${sample.id} returned to engineer for correction`, 'warning');
+      onClose();
+      setShowReturnForm(false);
+      setCorrectionRemarks('');
+    } catch (err) {
+      triggerNotification(`Failed to return sample: ${err.message || 'Unknown error'}`, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 overflow-y-auto animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-xl overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors my-8 text-xs font-medium text-slate-800 dark:text-slate-200">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 pt-3 sm:pt-4 bg-slate-950/75 backdrop-blur-xs font-sans overflow-y-auto animate-fade-in" role="dialog" aria-modal="true" aria-label="Verify Test Submission Dialog">
+      <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-xl my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors text-xs font-medium text-slate-800 dark:text-slate-200">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white border-b border-slate-800">
@@ -35,7 +53,7 @@ export default function VerifyTestResultsModal({ sample, isOpen, onClose }) {
             <FileCheck size={16} className="text-amber-500" />
             Verify Test Submission - {sample.id}
           </h3>
-          <button onClick={() => { onClose(); setShowReturnForm(false); }} className="text-slate-400 hover:text-white p-1 rounded">
+          <button type="button" onClick={() => { onClose(); setShowReturnForm(false); }} className="text-slate-400 hover:text-white p-1 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Close verify modal">
             <X size={18} />
           </button>
         </div>
@@ -108,9 +126,11 @@ export default function VerifyTestResultsModal({ sample, isOpen, onClose }) {
                       {doc}
                     </span>
                     <button 
-                      onClick={() => alert(`Downloading lab sheet: ${doc}`)}
-                      className="p-1 text-slate-400 hover:text-indigo-600"
+                      type="button"
+                      onClick={() => triggerNotification(`Downloading lab datasheet: ${doc}`, 'info')}
+                      className="p-1 text-slate-400 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded"
                       title="Download Datasheet"
+                      aria-label={`Download lab datasheet ${doc}`}
                     >
                       <Download size={13} />
                     </button>
@@ -176,10 +196,20 @@ export default function VerifyTestResultsModal({ sample, isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={handleVerify}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold transition-colors shadow-2xs text-xs flex items-center gap-1.5 cursor-pointer"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white rounded-lg font-bold transition-colors shadow-2xs text-xs flex items-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"
                 >
-                  <CheckCircle size={14} />
-                  Verify (Transfer to Reporting Queue)
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Verifying...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle size={14} />
+                      <span>Verify (Transfer to Reporting Queue)</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

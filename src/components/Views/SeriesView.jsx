@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layers, FileSpreadsheet, Printer, CheckCircle, Clock, FileText } from 'lucide-react';
+import { Layers, FileSpreadsheet, Printer } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
 import EmptyState from '../EmptyState';
 
@@ -33,7 +33,9 @@ export default function SeriesView({ subView }) {
   const filteredSeriesList = getFilteredSeries();
 
   const handleExportCSV = () => {
-    if (filteredSeriesList.length === 0) return alert('No series records to export.');
+    if (filteredSeriesList.length === 0) {
+      return triggerNotification('No series records available to export.', 'warning');
+    }
 
     const headers = ['Series ID', 'Product', 'Applicant', 'Request Date', 'Total Samples', 'Completed Reports', 'Pending Reports', 'Status'];
     const rows = filteredSeriesList.map(s => [
@@ -44,19 +46,18 @@ export default function SeriesView({ subView }) {
       s.sampleCount,
       s.completedReports,
       s.pendingReports,
-      `"${s.status}"`
+      s.status
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `NTB_Series_${activeSubViewName.replace(/\s+/g, '_')}.csv`);
+    link.setAttribute('download', `NTB_Series_Export_${new Date().toISOString().slice(0,10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    triggerNotification('Series CSV exported successfully', 'success');
+    triggerNotification(`Exported ${filteredSeriesList.length} series records to CSV`, 'success');
   };
 
   return (

@@ -73,15 +73,6 @@ export default function LoginModal({ isOpen, onClose }) {
 
   const activeRoleData = roleOptions.find(r => r.role === selectedRole);
 
-  const handleQuickLogin = (roleData) => {
-    login(roleData.role, {
-      name: roleData.name,
-      email: roleData.email,
-      avatar: roleData.avatar
-    });
-    onClose();
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userEmail = email || activeRoleData.email;
@@ -109,47 +100,48 @@ export default function LoginModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-fade-in font-sans">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 pt-3 sm:pt-4 bg-slate-950/75 backdrop-blur-xs animate-fade-in font-sans overflow-y-auto">
       <div 
         className="fixed inset-0" 
         onClick={onClose} 
       />
-      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-10 flex flex-col my-auto max-h-[90vh]">
+      <div className="relative w-full max-w-2xl bg-white rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-10 flex flex-col my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh]">
         
         {/* Modal Header */}
-        <div className="bg-[#1e3a8a] text-white p-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-white/10 text-[#f5b041]">
-              <LogIn size={22} />
+        <div className="bg-[#1e3a8a] text-white p-3.5 sm:p-5 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-white/10 text-[#f5b041] shrink-0">
+              <LogIn size={20} className="sm:w-[22px] sm:h-[22px]" />
             </div>
             <div>
-              <h2 className="text-base md:text-lg font-bold tracking-tight">
+              <h2 className="text-sm sm:text-base md:text-lg font-bold tracking-tight">
                 NTB Portal Multi-Role Login
               </h2>
-              <p className="text-blue-100 text-xs font-medium">
+              <p className="text-blue-100 text-[10px] sm:text-xs font-medium">
                 Select your accredited workstation role to authenticate
               </p>
             </div>
           </div>
           <button 
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-blue-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="p-1.5 text-blue-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors touch-manipulation min-h-[36px] min-w-[36px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
+            aria-label="Close login dialog"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 md:p-6 overflow-y-auto space-y-6 text-xs text-slate-800 scrollbar-thin">
+        <div className="p-3.5 sm:p-5 md:p-6 overflow-y-auto space-y-3.5 sm:space-y-6 text-xs text-slate-800 scrollbar-thin">
           
           {/* Role Cards Selection */}
           <div>
-            <label className="block text-[10px] uppercase font-bold tracking-wider text-slate-500 mb-2">
+            <label className="block text-[10px] uppercase font-bold tracking-wider text-slate-500 mb-1.5">
               Select Workstation Persona / Role
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
               {roleOptions.map((item) => {
-                const Icon = item.icon;
                 const isSelected = selectedRole === item.role;
                 return (
                   <button
@@ -159,26 +151,26 @@ export default function LoginModal({ isOpen, onClose }) {
                       setSelectedRole(item.role);
                       setEmail(item.email);
                     }}
-                    className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                    className={`p-2.5 sm:p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer touch-manipulation min-h-[72px] ${
                       isSelected 
                         ? `${item.color} shadow-sm ring-2 ring-indigo-500/40 font-bold`
                         : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${item.badgeColor}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold ${item.badgeColor}`}>
                         {item.role}
                       </span>
-                      {isSelected && <CheckCircle size={14} className="text-indigo-600" />}
+                      {isSelected && <CheckCircle size={13} className="text-indigo-600 shrink-0" />}
                     </div>
 
                     <div>
-                      <div className="font-extrabold text-xs text-slate-900">{item.name}</div>
-                      <div className="text-[10px] text-slate-500 font-medium truncate">{item.title}</div>
+                      <div className="font-extrabold text-[11px] sm:text-xs text-slate-900 truncate">{item.name}</div>
+                      <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium truncate">{item.title}</div>
                     </div>
 
-                    <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[9px] font-semibold text-slate-500">
-                      <span>Click to Select</span>
+                    <div className="mt-1 pt-1 border-t border-slate-200/60 flex items-center justify-between text-[8px] sm:text-[9px] font-semibold text-slate-500">
+                      <span>Select</span>
                       <ArrowRight size={10} />
                     </div>
                   </button>
@@ -187,25 +179,8 @@ export default function LoginModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          {/* Quick Demo 1-Click Login Banner */}
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <ShieldCheck size={18} className="text-amber-700 shrink-0" />
-              <div>
-                <div className="font-bold text-amber-900 text-xs">Instant Quick Login</div>
-                <div className="text-amber-700 text-[11px]">Log in directly as <strong>{activeRoleData.name} ({activeRoleData.role})</strong> without entering password.</div>
-              </div>
-            </div>
-            <button
-              onClick={() => handleQuickLogin(activeRoleData)}
-              className="bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 font-bold px-3 py-2 rounded-lg text-xs shadow-2xs whitespace-nowrap transition-colors cursor-pointer"
-            >
-              1-Click Login
-            </button>
-          </div>
-
           {/* Credentials Form */}
-          <form onSubmit={handleSubmit} className="space-y-3 border-t border-slate-200 pt-4">
+          <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3 border-t border-slate-200 pt-3 sm:pt-4">
             <div className="font-bold text-slate-900 text-xs">Official Account Credentials</div>
             
             <div>
@@ -217,7 +192,7 @@ export default function LoginModal({ isOpen, onClose }) {
                   value={email || activeRoleData.email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="e.g. officer@ntb.gov.in"
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[40px]"
                   required
                 />
               </div>
@@ -232,17 +207,27 @@ export default function LoginModal({ isOpen, onClose }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[40px]"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[#1e3a8a] hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl shadow-md text-xs transition-colors flex items-center justify-center gap-2 mt-2 cursor-pointer"
+              disabled={isLoading}
+              className="w-full bg-[#1e3a8a] hover:bg-blue-800 disabled:bg-blue-900/60 text-white font-black py-3 rounded-xl shadow-md text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 mt-2 cursor-pointer touch-manipulation min-h-[44px] focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
             >
-              <LogIn size={15} />
-              <span>Authenticate & Open Workstation</span>
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                <>
+                  <LogIn size={16} />
+                  <span>Authenticate & Open Workstation</span>
+                </>
+              )}
             </button>
           </form>
 

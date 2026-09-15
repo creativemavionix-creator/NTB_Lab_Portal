@@ -3,12 +3,13 @@ import { X, UserCheck } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
 
 export default function AllocateModal({ sample, isOpen, onClose }) {
-  const { engineers, sections, allocateSample } = useWorkflow();
+  const { engineers, sections, allocateSample, triggerNotification } = useWorkflow();
 
   const [selectedSection, setSelectedSection] = useState('Mechanical');
   const [selectedEng, setSelectedEng] = useState('');
   const [priority, setPriority] = useState('Medium');
   const [dueDate, setDueDate] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const filteredEngineers = engineers.filter(e => e.section === selectedSection);
 
@@ -32,17 +33,25 @@ export default function AllocateModal({ sample, isOpen, onClose }) {
 
   if (!isOpen || !sample) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedEng) return alert('Please select a Technical Engineer.');
+    if (!selectedEng) return triggerNotification('Please select a Technical Engineer.', 'warning');
     
-    allocateSample(sample.id, selectedEng, selectedSection, dueDate);
-    onClose();
+    try {
+      setIsSubmitting(true);
+      await allocateSample(sample.id, selectedEng, selectedSection, dueDate);
+      triggerNotification(`Sample ${sample.id} allocated to ${selectedEng} successfully`, 'success');
+      onClose();
+    } catch (err) {
+      triggerNotification(`Failed to allocate sample: ${err.message || 'Unknown error'}`, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 pt-3 sm:pt-4 bg-slate-950/75 backdrop-blur-xs font-sans overflow-y-auto animate-fade-in" role="dialog" aria-modal="true" aria-label="Allocate Sample Dialog">
+      <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-md my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white border-b border-slate-800">
@@ -50,7 +59,7 @@ export default function AllocateModal({ sample, isOpen, onClose }) {
             <UserCheck size={16} className="text-yellow-500" />
             Allocate Sample / Testing Task
           </h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded">
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Close allocation modal">
             <X size={18} />
           </button>
         </div>
@@ -137,9 +146,17 @@ export default function AllocateModal({ sample, isOpen, onClose }) {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-slate-950 rounded-lg font-bold transition-colors shadow-2xs"
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-slate-950 rounded-lg font-bold transition-colors shadow-2xs flex items-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
             >
-              Confirm Allocation
+              {isSubmitting ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Allocating...</span>
+                </>
+              ) : (
+                <span>Confirm Allocation</span>
+              )}
             </button>
           </div>
         </form>

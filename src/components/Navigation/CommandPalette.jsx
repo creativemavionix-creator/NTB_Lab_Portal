@@ -58,7 +58,7 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 md:pt-24 bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 md:pt-24 bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in" role="dialog" aria-modal="true" aria-label="Global Search Palette">
       <div 
         className="fixed inset-0"
         onClick={onClose}
@@ -75,10 +75,13 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 bg-transparent border-none outline-none text-slate-800 dark:text-slate-100 placeholder:text-slate-400 text-sm font-medium"
+            aria-label="Search query"
           />
           <button 
+            type="button"
             onClick={onClose}
-            className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none"
+            aria-label="Close search dialog"
           >
             <X size={18} />
           </button>

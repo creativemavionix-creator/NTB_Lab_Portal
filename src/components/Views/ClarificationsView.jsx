@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelpCircle, PlusCircle, FileText, Clock, CheckCircle, MessageSquare } from 'lucide-react';
+import { PlusCircle, MessageSquare } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
 import EmptyState from '../EmptyState';
 import ClarificationModal from '../Modals/ClarificationModal';
@@ -104,7 +104,7 @@ export default function ClarificationsView({ subView }) {
           
           {/* Mobile View */}
           <div className="block sm:hidden space-y-3 p-3 bg-slate-50 divide-y divide-slate-200">
-            {filteredList.map((clar, idx) => (
+            {filteredList.map((clar) => (
               <div key={clar.id} className="bg-white border border-slate-200 rounded-lg p-3.5 shadow-2xs space-y-2 text-xs pt-3">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <span className="font-mono font-bold text-indigo-900 text-xs">#{clar.id}</span>

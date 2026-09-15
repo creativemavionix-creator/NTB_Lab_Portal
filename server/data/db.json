@@ -178,9 +178,9 @@
       "priority": "High",
       "testingSection": "Mechanical",
       "testType": "Tos_101 Pend:1 Appr:0",
-      "assignedEngineer": "Harendra Singh",
+      "assignedEngineer": "Mariam Tyagi",
       "testRequestId": "TR-SUPP-901",
-      "allocationDate": "2026-01-11",
+      "allocationDate": "2026-09-14",
       "dueDate": "2026-02-10",
       "testResults": null,
       "testDate": null,
@@ -189,7 +189,7 @@
       "reportNumber": null,
       "reportDate": null,
       "reportingManager": null,
-      "status": "Supplementary Sample Received",
+      "status": "Samples Allocated",
       "type": "Supplementary"
     },
     {
@@ -1811,6 +1811,14 @@
       "id": 1789287848778,
       "time": "2026-09-13 13:54:08",
       "text": "Sample REQ-DISC-201 allocated to Mariam Tyagi (Mechanical)."
+    },
+    {
+      "id": 1,
+      "time": "12/9/2026, 11:32:12 pm",
+      "text": "System initialized with REST API Database persistence."
+    }
+  ]
+}echanical)."
     },
     {
       "id": 1,

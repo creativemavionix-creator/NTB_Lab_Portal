@@ -13,17 +13,14 @@ import {
   Layers, 
   HelpCircle, 
   PlusCircle, 
-  Eye, 
   Download, 
-  CheckCircle2, 
-  Clock, 
-  ArrowRight 
+  Clock 
 } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
 import GenerateTestRequestModal from '../Modals/GenerateTestRequestModal';
 import ViewDetailsModal from '../Modals/ViewDetailsModal';
 
-export default function SampleCellDashboardView({ setCurrentView, setCurrentSubView }) {
+export default function SampleCellDashboardView({ navToSubView }) {
   const { 
     samples, 
     series, 
@@ -32,13 +29,9 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
     sampleRequests,
     acceptSampleCell, 
     forwardSampleCell, 
-    handleDispute, 
     resolveDispute,
-    handleReturnRequest, 
-    handleDiscardRequest,
     approveReturnRequest,
     approveDiscardRequest,
-    withdrawSample, 
     triggerNotification 
   } = useWorkflow();
 
@@ -94,7 +87,7 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
     id: l.id,
     time: l.time,
     text: l.text,
-    sampleId: l.text.match(/#[A-Za-z0-9\-]+/) ? l.text.match(/#[A-Za-z0-9\-]+/)[0].replace('#', '') : null
+    sampleId: l.text.match(/#[A-Za-z0-9-]+/) ? l.text.match(/#[A-Za-z0-9-]+/)[0].replace('#', '') : null
   }));
 
   // Aggregated Pending Actions requiring urgent Sample Cell action
@@ -161,10 +154,17 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => navToRoute('Sample Handling', 'Create Sample', '#/sample-cell/handling/create')}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer touch-manipulation uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+          >
+            <PlusCircle size={16} />
+            <span>Register New Sample</span>
+          </button>
           <button
             onClick={() => setIsGenerateModalOpen(true)}
-            className="bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 px-4 py-2.5 rounded-lg font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer touch-manipulation uppercase tracking-wider"
+            className="bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 px-4 py-2.5 rounded-lg font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer touch-manipulation uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
           >
             <PlusCircle size={16} />
             <span>Generate Test Request</span>
@@ -323,7 +323,16 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
               <tbody className="divide-y divide-slate-100 font-medium">
                 {samples.slice(0, 4).map(s => (
                   <tr key={s.id} className="hover:bg-slate-50">
-                    <td className="p-2 font-bold text-[#1e3a8a] cursor-pointer hover:underline" onClick={() => handleOpenDetails(s)}>{s.id}</td>
+                    <td className="p-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDetails(s)}
+                        className="font-bold text-[#1e3a8a] hover:underline focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded text-left"
+                        aria-label={`View details for sample ${s.id}`}
+                      >
+                        {s.id}
+                      </button>
+                    </td>
                     <td className="p-2 text-slate-900 font-bold truncate max-w-[120px]">{s.product}</td>
                     <td className="p-2 text-slate-600 truncate max-w-[100px]">{s.applicant}</td>
                     <td className="p-2">
@@ -332,10 +341,20 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
                       </span>
                     </td>
                     <td className="p-2 text-right space-x-1">
-                      <button onClick={() => acceptSampleCell(s.id)} className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-bold cursor-pointer">
+                      <button
+                        type="button"
+                        onClick={() => acceptSampleCell(s.id)}
+                        className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-bold cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"
+                        aria-label={`Accept sample ${s.id}`}
+                      >
                         Accept
                       </button>
-                      <button onClick={() => handleOpenDetails(s)} className="px-2 py-0.5 bg-slate-700 hover:bg-slate-800 text-white rounded text-[10px] font-bold cursor-pointer">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDetails(s)}
+                        className="px-2 py-0.5 bg-slate-700 hover:bg-slate-800 text-white rounded text-[10px] font-bold cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:outline-none"
+                        aria-label={`View details for sample ${s.id}`}
+                      >
                         View
                       </button>
                     </td>
@@ -353,7 +372,11 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
               <Send size={16} className="text-[#f5b041]" />
               Forwarding Queue to Technical Manager
             </h3>
-            <button onClick={() => navToSubView('Forward')} className="text-[11px] font-bold text-indigo-700 hover:underline">
+            <button
+              type="button"
+              onClick={() => navToSubView('Forward')}
+              className="text-[11px] font-bold text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded"
+            >
               View All Forwarding →
             </button>
           </div>
@@ -372,7 +395,16 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
               <tbody className="divide-y divide-slate-100 font-medium">
                 {samples.slice(0, 4).map(s => (
                   <tr key={s.id} className="hover:bg-slate-50">
-                    <td className="p-2 font-bold text-[#1e3a8a] cursor-pointer hover:underline" onClick={() => handleOpenDetails(s)}>{s.id}</td>
+                    <td className="p-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDetails(s)}
+                        className="font-bold text-[#1e3a8a] hover:underline focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded text-left"
+                        aria-label={`View details for sample ${s.id}`}
+                      >
+                        {s.id}
+                      </button>
+                    </td>
                     <td className="p-2 text-slate-900 font-bold truncate max-w-[120px]">{s.product}</td>
                     <td className="p-2 font-bold text-indigo-700">{s.testingSection || 'Mechanical'}</td>
                     <td className="p-2">
@@ -381,7 +413,12 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
                       </span>
                     </td>
                     <td className="p-2 text-right">
-                      <button onClick={() => forwardSampleCell(s.id, 'Technical Manager')} className="px-2.5 py-0.5 bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 rounded text-[10px] font-black cursor-pointer">
+                      <button
+                        type="button"
+                        onClick={() => forwardSampleCell(s.id, 'Technical Manager')}
+                        className="px-2.5 py-0.5 bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 rounded text-[10px] font-black cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
+                        aria-label={`Forward sample ${s.id} to Technical Manager`}
+                      >
                         Forward to TM
                       </button>
                     </td>
@@ -422,7 +459,16 @@ export default function SampleCellDashboardView({ setCurrentView, setCurrentSubV
             <tbody className="divide-y divide-slate-200 font-medium">
               {samples.filter(s => ['Sent to Sample Cell', 'Testing Completed', 'Final Reports'].includes(s.status) || s.verificationStatus === 'Verified').slice(0, 5).map(s => (
                 <tr key={s.id} className="hover:bg-emerald-50/50">
-                  <td className="p-2.5 font-black text-[#1e3a8a] cursor-pointer hover:underline" onClick={() => handleOpenDetails(s)}>{s.id}</td>
+                  <td className="p-2.5">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDetails(s)}
+                      className="font-black text-[#1e3a8a] hover:underline focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded text-left"
+                      aria-label={`View details for sample ${s.id}`}
+                    >
+                      {s.id}
+                    </button>
+                  </td>
                   <td className="p-2.5 font-bold text-slate-800">{s.reportNumber || `REP-2026-${s.id}`}</td>
                   <td className="p-2.5 font-bold text-slate-900">{s.product}</td>
                   <td className="p-2.5 font-bold text-indigo-700">{s.testingSection}</td>

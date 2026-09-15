@@ -1,12 +1,15 @@
 import React from 'react';
-import { X, FileText, CheckCircle, Download, Printer, User, Calendar, ShieldCheck } from 'lucide-react';
+import { X, FileText, Download, Printer, User } from 'lucide-react';
+import { useWorkflow } from '../../context/WorkflowContext';
 
 export default function ViewSubmittedReportModal({ sample, isOpen, onClose }) {
+  const { triggerNotification } = useWorkflow();
+
   if (!isOpen || !sample) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-xs p-4 overflow-y-auto animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors my-8 text-xs font-medium text-slate-800 dark:text-slate-200">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 pt-3 sm:pt-4 bg-slate-950/75 backdrop-blur-xs font-sans overflow-y-auto animate-fade-in" role="dialog" aria-modal="true" aria-label="Submitted Test Report Certificate Dialog">
+      <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors text-xs font-medium text-slate-800 dark:text-slate-200">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white border-b border-slate-800">
@@ -14,7 +17,7 @@ export default function ViewSubmittedReportModal({ sample, isOpen, onClose }) {
             <FileText size={16} className="text-amber-500" />
             Submitted Test Report Certificate - {sample.reportNumber || `REP-${sample.id}`}
           </h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded">
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none" aria-label="Close submitted report modal">
             <X size={18} />
           </button>
         </div>
@@ -92,22 +95,25 @@ export default function ViewSubmittedReportModal({ sample, isOpen, onClose }) {
           <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={() => window.print()}
-                className="px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs flex items-center gap-1"
+                className="px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none"
               >
                 <Printer size={13} /> Print Certificate
               </button>
               <button
-                onClick={() => alert(`Downloaded PDF: ${sample.reportNumber || sample.id}.pdf`)}
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs flex items-center gap-1 shadow-2xs"
+                type="button"
+                onClick={() => triggerNotification(`Downloaded official PDF report: ${sample.reportNumber || sample.id}.pdf`, 'success')}
+                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs flex items-center gap-1 shadow-2xs focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none"
               >
                 <Download size={13} /> Download PDF
               </button>
             </div>
 
             <button
+              type="button"
               onClick={onClose}
-              className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs cursor-pointer"
+              className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
             >
               Close
             </button>

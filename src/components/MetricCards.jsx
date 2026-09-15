@@ -57,10 +57,12 @@ export default function MetricCards({ onCardClick }) {
         {engineerCards.map((card) => {
           const Icon = card.icon;
           return (
-            <div
+            <button
+              type="button"
               key={card.id}
               onClick={() => onCardClick('Sample Handling', card.subView)}
-              className={`p-5 bg-white border border-slate-200 rounded-xl shadow-2xs hover:shadow-md transition-all cursor-pointer group flex items-center justify-between ${card.color}`}
+              className={`p-5 bg-white border border-slate-200 rounded-xl shadow-2xs hover:shadow-md transition-all cursor-pointer group flex items-center justify-between text-left focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none ${card.color}`}
+              aria-label={`View ${card.title} (${card.count} items)`}
             >
               <div className="space-y-1">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider group-hover:text-slate-800">
@@ -76,7 +78,7 @@ export default function MetricCards({ onCardClick }) {
               <div className="p-3 bg-white rounded-xl shadow-2xs border border-slate-100 group-hover:scale-110 transition-transform">
                 <Icon size={24} className="stroke-[2]" />
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -208,9 +210,11 @@ export default function MetricCards({ onCardClick }) {
         const count = getMetricCount(card.id);
         return (
           <button
+            type="button"
             key={card.id}
             onClick={() => onCardClick('Sample Handling', card.subView)}
-            className={`flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-2xs hover:shadow-md transition-all text-left group cursor-pointer ${card.color}`}
+            className={`flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-2xs hover:shadow-md transition-all text-left group cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none ${card.color}`}
+            aria-label={`View ${card.title} (${count} items)`}
           >
             <div className="flex flex-col gap-1 pr-2">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-800 transition-colors">

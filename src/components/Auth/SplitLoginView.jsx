@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
-import { FlaskConical, ShieldCheck, Lock, UserCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { FlaskConical, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
 
 export default function SplitLoginView({ onClose }) {
-  const { login } = useWorkflow();
+  const { login, triggerNotification } = useWorkflow();
   const [employeeId, setEmployeeId] = useState('NTB-SC-101');
   const [password, setPassword] = useState('••••••••');
   const [rememberMe, setRememberMe] = useState(true);
   const [role, setRole] = useState('Sample Cell');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(role, { id: employeeId, name: role === 'Sample Cell' ? 'Inward Officer' : 'V. K. Jain' });
-    if (onClose) onClose();
+    try {
+      setIsSubmitting(true);
+      await login(role, { id: employeeId, name: role === 'Sample Cell' ? 'Inward Officer' : 'V. K. Jain' });
+      triggerNotification(`Authenticated as ${role} workstation persona`, 'success');
+      if (onClose) onClose();
+    } catch (err) {
+      triggerNotification(`Login failed: ${err.message || 'Unknown error'}`, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 font-sans">
-      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 min-h-[580px] border border-slate-700">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 pt-3 sm:pt-4 bg-slate-950/80 backdrop-blur-sm font-sans overflow-y-auto animate-fade-in">
+      <div className="w-full max-w-5xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh] overflow-y-auto border border-slate-700">
         
         {/* LEFT PANEL: Branding & Visual Graphic */}
         <div className="bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#1e3a8a] p-8 md:p-12 text-white flex flex-col justify-between relative overflow-hidden">
@@ -131,17 +140,31 @@ export default function SplitLoginView({ onClose }) {
                   />
                   <span>Remember Me</span>
                 </label>
-                <button type="button" className="text-indigo-700 hover:underline font-bold">
+                <button
+                  type="button"
+                  onClick={() => triggerNotification('Please contact NTB System Administrator at ntb-admin@ntb.gov.in for password reset.', 'info')}
+                  className="text-indigo-700 hover:underline font-bold focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded"
+                >
                   Forgot Password?
                 </button>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 bg-[#f59e0b] hover:bg-[#e09b2d] text-slate-950 font-black text-sm rounded-lg shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer touch-manipulation uppercase tracking-wider"
+                disabled={isSubmitting}
+                className="w-full py-3 bg-[#f59e0b] hover:bg-[#e09b2d] disabled:bg-amber-300 text-slate-950 font-black text-sm rounded-lg shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer touch-manipulation uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
               >
-                <span>Sign In to Portal</span>
-                <ArrowRight size={16} />
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    <span>Signing In...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In to Portal</span>
+                    <ArrowRight size={16} />
+                  </>
+                )}
               </button>
             </form>
           </div>

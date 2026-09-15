@@ -11,12 +11,10 @@ import {
   CheckCircle,
   FileCheck,
   UserCheck,
-  RotateCcw,
   Eye,
   FileText,
   Play,
-  ClipboardCheck,
-  Award
+  ClipboardCheck
 } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
 import EmptyState from '../EmptyState';
@@ -29,6 +27,7 @@ import LifecycleTimelineModal from '../Modals/LifecycleTimelineModal';
 import VerifyTestResultsModal from '../Modals/VerifyTestResultsModal';
 import AmendedReportReviewModal from '../Modals/AmendedReportReviewModal';
 import ViewSubmittedReportModal from '../Modals/ViewSubmittedReportModal';
+import CreateSampleView from '../SampleCell/CreateSampleView';
 
 export default function SampleHandlingView({ subView }) {
   const { 
@@ -37,20 +36,11 @@ export default function SampleHandlingView({ subView }) {
     selectedRole, 
     selectedEngineer, 
     engineers,
-    masterData,
     sampleRequests,
     addSample, 
     acceptSample,
-    acceptSampleCell,
-    forwardSampleCell,
     startTesting,
-    verifyTestResults,
     sendReportToSampleCell,
-    approveReturnRequest,
-    rejectReturnRequest,
-    approveDiscardRequest,
-    rejectDiscardRequest,
-    resolveDispute,
     triggerNotification 
   } = useWorkflow();
 
@@ -61,7 +51,6 @@ export default function SampleHandlingView({ subView }) {
   const [toDate, setToDate] = useState('');
   const [searchIsNumber, setSearchIsNumber] = useState('');
   const [sectionFilter, setSectionFilter] = useState('All');
-  const [forwardTargets, setForwardTargets] = useState({});
 
   // Determine active engineer's section (e.g., Mechanical, Chemical, Electrical, etc.)
   const activeEngineerObj = engineers?.find(e => e.name === selectedEngineer);
@@ -249,7 +238,7 @@ export default function SampleHandlingView({ subView }) {
   };
 
   const handleExportCSV = () => {
-    if (filteredList.length === 0) return alert('No records to export.');
+    if (filteredList.length === 0) return triggerNotification('No records available to export.', 'warning');
 
     const headers = ['ID', 'Product', 'Applicant', 'Standard', 'Quantity', 'Priority', 'Status', 'Assigned Engineer', 'Received Date'];
     const rows = filteredList.map(s => [
@@ -280,7 +269,7 @@ export default function SampleHandlingView({ subView }) {
 
   const handleSampleSubmit = (e) => {
     e.preventDefault();
-    if (!product || !applicant || !requiredTests) return alert('Please enter required details.');
+    if (!product || !applicant || !requiredTests) return triggerNotification('Please fill in Product Name, Applicant Name, and Required Tests.', 'warning');
     
     addSample({
       product,
@@ -383,6 +372,10 @@ export default function SampleHandlingView({ subView }) {
     );
   };
 
+  if (activeSubViewName === 'Create Sample') {
+    return <CreateSampleView />;
+  }
+
   return (
     <div className="flex-1 p-4 md:p-6 space-y-4 pb-20 bg-[#edf3f9] text-slate-800 min-h-full font-sans">
       
@@ -393,13 +386,18 @@ export default function SampleHandlingView({ subView }) {
             {activeSubViewName.toUpperCase()}
           </h2>
           <div className="flex items-center gap-2 text-[11px] text-slate-600 font-semibold">
-            <span className="flex items-center gap-1 cursor-pointer hover:text-indigo-600">
+            <span className="flex items-center gap-1">
               <Filter size={13} className="text-indigo-600" />
               Filter
             </span>
-            <span className="cursor-pointer hover:text-indigo-600 text-slate-500" onClick={handleResetFilters}>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="cursor-pointer hover:text-indigo-600 text-slate-500 font-bold focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded"
+              aria-label="Reset search filters"
+            >
               Reset
-            </span>
+            </button>
             <span className="text-slate-400">|</span>
             <span className="text-slate-700 font-bold">{filteredList.length} Results</span>
             {selectedRole === 'Technical Manager' && (
@@ -921,9 +919,11 @@ export default function SampleHandlingView({ subView }) {
 
                     <td className="p-3 text-center">
                       <button
-                        onClick={() => alert(`Downloading Jobcard spec file for ${sample.id} (${sample.standard || sample.product})`)}
-                        className="p-1 text-slate-400 hover:text-slate-800 rounded"
+                        type="button"
+                        onClick={() => triggerNotification(`Downloading Jobcard specification file for ${sample.id} (${sample.standard || sample.product})`, 'info')}
+                        className="p-1 text-slate-400 hover:text-slate-800 rounded focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none"
                         title="Download Jobcard"
+                        aria-label={`Download Jobcard specification for ${sample.id}`}
                       >
                         <Download size={14} />
                       </button>

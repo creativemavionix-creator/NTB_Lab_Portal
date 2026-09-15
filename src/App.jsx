@@ -57,7 +57,7 @@ function AppContent() {
 
     if (selectedRole === 'Reporting Manager') {
       if (view === 'Admin') return false;
-      if (view === 'Sample Handling' && !['Reports Pending', 'Amended Reports Pending', 'Final Reports'].includes(subView)) return false;
+      if (view === 'Sample Handling' && !['Create Sample', 'Reports Pending', 'Amended Reports Pending', 'Final Reports'].includes(subView)) return false;
       return true;
     }
 
@@ -71,6 +71,9 @@ function AppContent() {
     
     // Explicit aliases map from section 2 target routes
     const aliases = {
+      'create': 'Create Sample',
+      'create-sample': 'Create Sample',
+      'create sample': 'Create Sample',
       'accept': 'Accept',
       'forward': 'Forward',
       'pending-reports': 'Pending Test Reports',
@@ -95,7 +98,7 @@ function AppContent() {
     if (aliases[str.toLowerCase()]) return aliases[str.toLowerCase()];
 
     const knownSubViews = [
-      'Sample Receipt', 'Pending Samples', 'Issued Test Report',
+      'Create Sample', 'Sample Receipt', 'Pending Samples', 'Issued Test Report',
       'New Sample Received', 'Supplementary Sample Received', 'Amended Sample Received',
       'Pending Amendment Requests', 'Samples Allocated / Pending View', 'Samples Allocated / Pending',
       'Verify Test Results', 'Reports Pending', 'Amended Reports Pending',
@@ -293,8 +296,10 @@ function AppContent() {
         />
 
         {/* Scrollable View Area (Exact PDF Canvas) */}
-        <main className="flex-1 overflow-y-auto bg-[#edf3f9]">
-          {renderActiveView()}
+        <main className="flex-1 overflow-y-auto bg-[#edf3f9] scrollbar-thin">
+          <div className="max-w-[1600px] w-full mx-auto">
+            {renderActiveView()}
+          </div>
         </main>
 
       </div>
