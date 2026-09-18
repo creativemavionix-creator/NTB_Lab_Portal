@@ -77,19 +77,19 @@ export default function ClarificationsView({ subView }) {
     <div className="flex-1 p-4 md:p-6 space-y-4 pb-20 bg-[#edf3f9] text-slate-800 min-h-full font-sans">
       
       {/* Title Header */}
-      <div className="flex items-center justify-between text-xs font-bold text-slate-800">
-        <div className="flex items-center gap-3">
-          <h2 className="text-sm md:text-base font-extrabold text-[#1e3a8a] uppercase tracking-tight">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold text-slate-800 min-w-0">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <h2 className="text-sm md:text-base font-extrabold text-[#1e3a8a] uppercase tracking-tight truncate min-w-0 flex-1">
             SAMPLE CLARIFICATIONS MODULE - {activeSubViewName.toUpperCase()}
           </h2>
-          <div className="flex items-center gap-2 text-[11px] text-slate-600 font-semibold">
+          <div className="flex items-center gap-2 text-[11px] text-slate-600 font-semibold shrink-0">
             <span className="text-slate-700 font-bold">{filteredList.length} Results</span>
           </div>
         </div>
 
         <button
           onClick={() => { setSelectedClar(null); setIsRaiseOpen(true); }}
-          className="bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1 shadow-2xs transition-colors cursor-pointer touch-manipulation"
+          className="bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1 shadow-2xs transition-colors cursor-pointer touch-manipulation shrink-0 self-start sm:self-auto"
         >
           <PlusCircle size={13} />
           <span>Raise Technical Query</span>
@@ -100,21 +100,21 @@ export default function ClarificationsView({ subView }) {
       {filteredList.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="bg-white border border-slate-200 rounded shadow-2xs overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded shadow-2xs overflow-hidden min-w-0">
           
           {/* Mobile View */}
-          <div className="block sm:hidden space-y-3 p-3 bg-slate-50 divide-y divide-slate-200">
+          <div className="block sm:hidden space-y-3 p-3 bg-slate-50 divide-y divide-slate-200 min-w-0">
             {filteredList.map((clar) => (
-              <div key={clar.id} className="bg-white border border-slate-200 rounded-lg p-3.5 shadow-2xs space-y-2 text-xs pt-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="font-mono font-bold text-indigo-900 text-xs">#{clar.id}</span>
-                  <div className="flex items-center gap-1.5">
+              <div key={clar.id} className="bg-white border border-slate-200 rounded-lg p-3.5 shadow-2xs space-y-2 text-xs pt-3 min-w-0">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2 min-w-0 gap-2">
+                  <span className="font-mono font-bold text-indigo-900 text-xs shrink-0">#{clar.id}</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {clar.status === 'Open' && (
-                      <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                      <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
                         {calculateDaysOpen(clar.dateRaised)} Open
                       </span>
                     )}
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase shrink-0 ${
                       clar.status === 'Open' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                     }`}>
                       {clar.status === 'Open' ? 'Open Query' : 'Closed'}
@@ -122,37 +122,37 @@ export default function ClarificationsView({ subView }) {
                   </div>
                 </div>
 
-                <div className="font-bold text-slate-900 text-xs">{clar.subject}</div>
+                <div className="font-bold text-slate-900 text-xs break-words">{clar.subject}</div>
 
-                <div className="grid grid-cols-2 gap-2 text-[10px] pt-1">
-                  <div>
+                <div className="grid grid-cols-2 gap-2 text-[10px] pt-1 min-w-0">
+                  <div className="min-w-0">
                     <span className="text-slate-400 font-bold block text-[8px] uppercase">Sample Ref</span>
-                    <span className="font-mono font-bold text-indigo-700">{clar.sampleId}</span>
+                    <span className="font-mono font-bold text-indigo-700 truncate block">{clar.sampleId}</span>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-slate-400 font-bold block text-[8px] uppercase">Raised On</span>
-                    <span className="font-semibold text-slate-700">{clar.dateRaised || clar.dateReceived}</span>
+                    <span className="font-semibold text-slate-700 truncate block">{clar.dateRaised || clar.dateReceived}</span>
                   </div>
                 </div>
 
                 {clar.clarification && (
-                  <div className="bg-slate-50 border border-slate-200 rounded p-2 text-[10px] text-slate-700">
+                  <div className="bg-slate-50 border border-slate-200 rounded p-2 text-[10px] text-slate-700 break-words min-w-0">
                     <span className="font-bold block text-[8px] uppercase text-slate-500">Query Details</span>
                     {clar.clarification}
                   </div>
                 )}
 
                 {clar.response && (
-                  <div className="bg-emerald-50 border border-emerald-200 rounded p-2 text-[10px] text-emerald-900">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded p-2 text-[10px] text-emerald-900 break-words min-w-0">
                     <span className="font-bold block text-[8px] uppercase text-emerald-700">Resolution</span>
                     {clar.response}
                   </div>
                 )}
 
-                <div className="flex justify-end pt-2 border-t border-slate-100 gap-1.5">
+                <div className="flex justify-end pt-2 border-t border-slate-100 gap-1.5 shrink-0">
                   <button
                     onClick={() => handleRowClick(clar)}
-                    className="bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 px-3 py-1 rounded font-bold text-[11px] flex items-center gap-1 shadow-2xs"
+                    className="bg-[#f5b041] hover:bg-[#e09b2d] text-slate-950 px-3 py-1 rounded font-bold text-[11px] flex items-center gap-1 shadow-2xs cursor-pointer shrink-0"
                   >
                     <span>{clar.status === 'Open' ? 'Respond / Close' : 'View Resolution'}</span>
                   </button>

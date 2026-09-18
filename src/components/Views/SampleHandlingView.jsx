@@ -380,33 +380,33 @@ export default function SampleHandlingView({ subView }) {
     <div className="flex-1 p-4 md:p-6 space-y-4 pb-20 bg-[#edf3f9] text-slate-800 min-h-full font-sans">
       
       {/* View Title Bar */}
-      <div className="flex items-center justify-between text-xs font-bold text-slate-800">
-        <div className="flex items-center gap-3">
-          <h2 className="text-sm md:text-base font-extrabold text-[#1e3a8a] uppercase tracking-tight">
+      <div className="flex flex-col md:flex-row md:items-center justify-between text-xs font-bold text-slate-800 gap-3 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
+          <h2 className="text-sm md:text-base font-extrabold text-[#1e3a8a] uppercase tracking-tight shrink-0">
             {activeSubViewName.toUpperCase()}
           </h2>
-          <div className="flex items-center gap-2 text-[11px] text-slate-600 font-semibold">
-            <span className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600 font-semibold min-w-0">
+            <span className="flex items-center gap-1 shrink-0">
               <Filter size={13} className="text-indigo-600" />
               Filter
             </span>
             <button
               type="button"
               onClick={handleResetFilters}
-              className="cursor-pointer hover:text-indigo-600 text-slate-500 font-bold focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded"
+              className="cursor-pointer hover:text-indigo-600 text-slate-500 font-bold focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none rounded shrink-0"
               aria-label="Reset search filters"
             >
               Reset
             </button>
-            <span className="text-slate-400">|</span>
-            <span className="text-slate-700 font-bold">{filteredList.length} Results</span>
+            <span className="text-slate-400 shrink-0">|</span>
+            <span className="text-slate-700 font-bold shrink-0">{filteredList.length} Results</span>
             {selectedRole === 'Technical Manager' && (
-              <div className="flex items-center gap-1.5 bg-white border border-slate-300 rounded px-2 py-0.5 shadow-2xs">
-                <span className="text-slate-600 font-bold text-[10px]">Filter Section:</span>
+              <div className="flex items-center gap-1.5 bg-white border border-slate-300 rounded px-2 py-0.5 shadow-2xs shrink-0 max-w-full">
+                <span className="text-slate-600 font-bold text-[10px] shrink-0">Filter Section:</span>
                 <select
                   value={sectionFilter}
                   onChange={(e) => setSectionFilter(e.target.value)}
-                  className="bg-transparent text-[11px] text-slate-900 font-bold focus:outline-none cursor-pointer"
+                  className="bg-transparent text-[11px] text-slate-900 font-bold focus:outline-none cursor-pointer truncate"
                 >
                   <option value="All">All Sections</option>
                   <option value="Mechanical">Mechanical Section</option>
@@ -418,24 +418,24 @@ export default function SampleHandlingView({ subView }) {
               </div>
             )}
             {selectedRole === 'Technical Engineer' && (
-              <span className="text-xs bg-slate-200 border border-slate-300 px-2.5 py-1 rounded text-slate-800 font-bold">
+              <span className="text-xs bg-slate-200 border border-slate-300 px-2.5 py-1 rounded text-slate-800 font-bold truncate max-w-full">
                 Filtered for: {selectedEngineer} ({activeEngineerObj?.id || 'ENG-101'}) - {activeSection} Laboratory
               </span>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-3 py-1.5 rounded shadow-2xs transition-colors"
+            className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-3 py-1.5 rounded shadow-2xs transition-colors shrink-0"
           >
             <FileSpreadsheet size={13} />
             <span>CSV Export</span>
           </button>
           <button
             onClick={() => window.print()}
-            className="p-1 text-slate-500 hover:text-slate-900"
+            className="p-1 text-slate-500 hover:text-slate-900 shrink-0"
             title="Print View"
           >
             <Printer size={16} />

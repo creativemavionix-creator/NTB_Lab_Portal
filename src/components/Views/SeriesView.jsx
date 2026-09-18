@@ -64,32 +64,32 @@ export default function SeriesView({ subView }) {
     <div className="flex-1 p-4 md:p-6 space-y-4 pb-20 bg-[#edf3f9] text-slate-800 min-h-full font-sans">
       
       {/* Title Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-[#1e293b] text-[#f59e0b] rounded-lg shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold min-w-0">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="p-2 bg-[#1e293b] text-[#f59e0b] rounded-lg shadow-2xs shrink-0">
             <Layers size={20} />
           </div>
-          <div>
-            <h2 className="text-sm md:text-base font-extrabold text-[#1e3a8a] uppercase tracking-tight">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-sm md:text-base font-extrabold text-[#1e3a8a] uppercase tracking-tight truncate">
               SERIES MANAGEMENT MODULE - {activeSubViewName.toUpperCase()}
             </h2>
-            <p className="text-[11px] text-slate-500 font-semibold">
+            <p className="text-[11px] text-slate-500 font-semibold truncate">
               Tracking multi-sample series batches, cumulative testing progress, and series certificates.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-3 py-1.5 rounded shadow-2xs transition-colors cursor-pointer"
+            className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-3 py-1.5 rounded shadow-2xs transition-colors cursor-pointer shrink-0"
           >
             <FileSpreadsheet size={13} />
             <span>Export CSV</span>
           </button>
           <button
             onClick={() => window.print()}
-            className="p-1 text-slate-500 hover:text-slate-900 cursor-pointer"
+            className="p-1 text-slate-500 hover:text-slate-900 cursor-pointer shrink-0"
             title="Print Series View"
           >
             <Printer size={16} />
@@ -98,14 +98,14 @@ export default function SeriesView({ subView }) {
       </div>
 
       {/* Search Input */}
-      <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-2xs flex items-center gap-3 text-xs">
-        <span className="font-bold text-slate-600 uppercase text-[10px]">Filter Series:</span>
+      <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-2xs flex items-center gap-3 text-xs min-w-0">
+        <span className="font-bold text-slate-600 uppercase text-[10px] shrink-0">Filter Series:</span>
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search by Series ID, Product name, or Applicant..."
-          className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-300 rounded font-medium focus:outline-none text-slate-900"
+          className="flex-1 min-w-0 px-3 py-1.5 bg-slate-50 border border-slate-300 rounded font-medium focus:outline-none text-slate-900"
         />
       </div>
 

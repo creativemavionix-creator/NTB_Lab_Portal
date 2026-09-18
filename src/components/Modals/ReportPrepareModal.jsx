@@ -15,11 +15,9 @@ export default function ReportPrepareModal({ sample, isOpen, onClose }) {
     if (sample && isOpen) {
       const randomId = Math.floor(1000 + Math.random() * 9000);
       setReportNo(sample.reportNumber || `REP-${new Date().getFullYear()}-${randomId}`);
-      if (reportingManagers.length > 0) {
-        setSelectedRm(reportingManagers[0].name);
-      }
+      setSelectedRm(reportingManagers.length > 0 ? reportingManagers[0].name : '');
     }
-  }, [sample, isOpen, reportingManagers]);
+  }, [sample?.id, isOpen]);
 
   if (!isOpen || !sample) return null;
 
@@ -58,7 +56,7 @@ export default function ReportPrepareModal({ sample, isOpen, onClose }) {
         {/* Content */}
         {!previewMode ? (
           <form onSubmit={(e) => { e.preventDefault(); setPreviewMode(true); }} className="p-6 space-y-4 text-xs text-slate-800 dark:text-slate-200 font-medium">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Generated Report Draft ID</label>
                 <input
@@ -87,11 +85,11 @@ export default function ReportPrepareModal({ sample, isOpen, onClose }) {
 
             <div>
               <span className="text-[10px] text-slate-400 uppercase font-bold">Lab Results Summary</span>
-              <div className="mt-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-slate-700 dark:text-slate-300 space-y-2 leading-relaxed">
-                <div><span className="font-bold text-slate-900 dark:text-slate-100">Sample ID:</span> {sample.id}</div>
+              <div className="mt-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-slate-700 dark:text-slate-300 space-y-2 leading-relaxed min-w-0 break-words">
+                <div><span className="font-bold text-slate-900 dark:text-slate-100">Sample ID:</span> <span className="font-mono font-bold text-indigo-700 dark:text-indigo-400">{sample.id}</span></div>
                 <div><span className="font-bold text-slate-900 dark:text-slate-100">Applicant:</span> {sample.applicant}</div>
                 <div><span className="font-bold text-slate-900 dark:text-slate-100">Testing Standard:</span> {sample.standard}</div>
-                <div><span className="font-bold text-slate-900 dark:text-slate-100">Engineer Findings:</span> <p className="text-slate-700 dark:text-slate-300 mt-1 whitespace-pre-wrap bg-white dark:bg-slate-900 p-2 border border-slate-200 dark:border-slate-700 rounded">{sample.testResults}</p></div>
+                <div><span className="font-bold text-slate-900 dark:text-slate-100">Engineer Findings:</span> <p className="text-slate-700 dark:text-slate-300 mt-1 whitespace-pre-wrap bg-white dark:bg-slate-900 p-2 border border-slate-200 dark:border-slate-700 rounded break-words min-w-0">{sample.testResults}</p></div>
               </div>
             </div>
 

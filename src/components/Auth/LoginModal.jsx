@@ -3,79 +3,39 @@ import { ShieldCheck, UserCheck, Settings, Users, LogIn, Lock, Mail, X, CheckCir
 import { useWorkflow } from '../../context/WorkflowContext';
 import { authService } from '../../services/authService';
 import { isSupabaseConfigured } from '../../services/supabaseClient';
+import { ROLE_CREDENTIALS, validateRoleCredentials } from '../../config/roleCredentials';
 
 export default function LoginModal({ isOpen, onClose }) {
   const { login, triggerNotification } = useWorkflow();
   const [selectedRole, setSelectedRole] = useState('Technical Manager');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(ROLE_CREDENTIALS['Technical Manager'].email);
+  const [password, setPassword] = useState(ROLE_CREDENTIALS['Technical Manager'].password);
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const roleOptions = [
-    {
-      role: 'Technical Manager',
-      name: 'V. K. Jain',
-      title: 'Head Technical Manager',
-      email: 'vk.jain@ntb.gov.in',
-      avatar: 'VJ',
-      color: 'border-blue-600 bg-blue-50 text-blue-900',
-      badgeColor: 'bg-[#1e3a8a] text-white',
-      icon: ShieldCheck,
-      desc: 'Sample allocation, test result verification, section supervision.'
-    },
-    {
-      role: 'Technical Engineer',
-      name: 'Mariam Tyagi',
-      title: 'Senior Mechanical Engineer',
-      email: 'mariam@ntb.gov.in',
-      avatar: 'MT',
-      color: 'border-emerald-600 bg-emerald-50 text-emerald-900',
-      badgeColor: 'bg-emerald-600 text-white',
-      icon: Users,
-      desc: 'Conduct physical & chemical testing, submit test findings.'
-    },
-    {
-      role: 'Sample Cell',
-      name: 'Inward Officer',
-      title: 'Sample Cell Executive',
-      email: 'samplecell@ntb.gov.in',
-      avatar: 'SC',
-      color: 'border-amber-600 bg-amber-50 text-amber-900',
-      badgeColor: 'bg-amber-600 text-white',
-      icon: UserCheck,
-      desc: 'Sample receipt, metadata inwarding, report release.'
-    },
-    {
-      role: 'Reporting Manager',
-      name: 'S. P. Yadav',
-      title: 'Quality Reporting Manager',
-      email: 'sp.yadav@ntb.gov.in',
-      avatar: 'SY',
-      color: 'border-cyan-600 bg-cyan-50 text-cyan-900',
-      badgeColor: 'bg-cyan-600 text-white',
-      icon: Settings,
-      desc: 'Compile test certificates & final report release.'
-    },
-    {
-      role: 'Admin',
-      name: 'System Admin',
-      title: 'NTB Master Admin',
-      email: 'admin@ntb.gov.in',
-      avatar: 'AD',
-      color: 'border-rose-600 bg-rose-50 text-rose-900',
-      badgeColor: 'bg-rose-600 text-white',
-      icon: Settings,
-      desc: 'Master personnel management, LIMS integration, SOP publishing.'
-    }
-  ];
+  const roleOptions = Object.values(ROLE_CREDENTIALS).map(r => ({
+    ...r,
+    icon: r.role === 'Technical Manager' ? ShieldCheck : r.role === 'Technical Engineer' ? Users : r.role === 'Sample Cell' ? UserCheck : Settings
+  }));
 
-  const activeRoleData = roleOptions.find(r => r.role === selectedRole);
+  const activeRoleData = ROLE_CREDENTIALS[selectedRole] || ROLE_CREDENTIALS['Technical Manager'];
+
+  const handleRoleSelect = (item) => {
+    setSelectedRole(item.role);
+    setEmail(item.email);
+    setPassword(item.password);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userEmail = email || activeRoleData.email;
+
+    const validation = validateRoleCredentials(selectedRole, userEmail, password);
+    if (!validation.valid) {
+      triggerNotification(validation.message, 'error');
+      return;
+    }
 
     if (isSupabaseConfigured && password) {
       setIsLoading(true);
@@ -83,7 +43,6 @@ export default function LoginModal({ isOpen, onClose }) {
       setIsLoading(false);
 
       if (error) {
-        // Fallback or attempt auto sign up for demo credentials
         console.warn('Supabase auth failed, falling back to local workflow login:', error);
         triggerNotification(`Supabase auth note: ${error}. Logged in locally.`, 'warning');
       } else {
@@ -91,7 +50,8 @@ export default function LoginModal({ isOpen, onClose }) {
       }
     }
 
-    login(selectedRole, {
+    await login(selectedRole, {
+      id: activeRoleData.id,
       name: activeRoleData.name,
       email: userEmail,
       avatar: activeRoleData.avatar
@@ -147,10 +107,7 @@ export default function LoginModal({ isOpen, onClose }) {
                   <button
                     key={item.role}
                     type="button"
-                    onClick={() => {
-                      setSelectedRole(item.role);
-                      setEmail(item.email);
-                    }}
+                    onClick={() => handleRoleSelect(item)}
                     className={`p-2.5 sm:p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer touch-manipulation min-h-[72px] ${
                       isSelected 
                         ? `${item.color} shadow-sm ring-2 ring-indigo-500/40 font-bold`

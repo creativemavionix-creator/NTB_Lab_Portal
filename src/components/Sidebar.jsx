@@ -255,9 +255,9 @@ export default function Sidebar({ currentView, setCurrentView, currentSubView, s
                       }`}
                       aria-label={`Navigate to Series ${item.name}`}
                     >
-                      <span>{item.name}</span>
+                      <span className="truncate pr-1">{item.name}</span>
                       {item.count > 0 && (
-                        <span className="px-1.5 py-0.2 text-[9px] font-bold rounded-full bg-slate-900 text-[#f59e0b] border border-slate-700">
+                        <span className="px-1.5 py-0.2 text-[9px] font-bold rounded-full bg-slate-900 text-[#f59e0b] border border-slate-700 shrink-0">
                           {item.count}
                         </span>
                       )}

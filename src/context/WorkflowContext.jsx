@@ -1642,7 +1642,7 @@ export const WorkflowProvider = ({ children }) => {
         }
       });
       return Array.from(parsedMap.values());
-    } catch (e) {
+    } catch {
       return INITIAL_SAMPLES;
     }
   });
@@ -1656,7 +1656,7 @@ export const WorkflowProvider = ({ children }) => {
       const existingIds = new Set(parsed.map(c => c.id));
       const missing = INITIAL_CLARIFICATIONS.filter(c => !existingIds.has(c.id));
       return [...parsed, ...missing];
-    } catch (e) {
+    } catch {
       return INITIAL_CLARIFICATIONS;
     }
   });
@@ -1667,15 +1667,38 @@ export const WorkflowProvider = ({ children }) => {
     try {
       const parsed = JSON.parse(saved);
       return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_MANUALS;
-    } catch (e) {
+    } catch {
       return INITIAL_MANUALS;
     }
   });
   
   const [baseEngineers] = useState(INITIAL_ENGINEERS);
   const [oics] = useState(INITIAL_OICS);
-  const [reportingManagers] = useState(INITIAL_REPORTING_MANAGERS);
-  const [sections] = useState(INITIAL_SECTIONS);
+  const [reportingManagers, setReportingManagers] = useState(INITIAL_REPORTING_MANAGERS);
+  const [sections, setSections] = useState(INITIAL_SECTIONS);
+  const [baseSeries, setBaseSeries] = useState(INITIAL_SERIES);
+
+  const [masterData, setMasterData] = useState(() => {
+    const saved = localStorage.getItem('ntb_master_data');
+    if (!saved) return INITIAL_MASTER_DATA;
+    try {
+      const parsed = JSON.parse(saved);
+      return typeof parsed === 'object' && parsed !== null ? { ...INITIAL_MASTER_DATA, ...parsed } : INITIAL_MASTER_DATA;
+    } catch {
+      return INITIAL_MASTER_DATA;
+    }
+  });
+
+  const [sampleRequests, setSampleRequests] = useState(() => {
+    const saved = localStorage.getItem('ntb_sample_requests');
+    if (!saved) return INITIAL_SAMPLE_REQUESTS;
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_SAMPLE_REQUESTS;
+    } catch {
+      return INITIAL_SAMPLE_REQUESTS;
+    }
+  });
   
   const [notifications, setNotifications] = useState([]);
   
@@ -1698,7 +1721,7 @@ export const WorkflowProvider = ({ children }) => {
     return map[engName] || { id: 'ENG-101', section: 'Mechanical' };
   };
 
-  const login = (role, userDetails = {}) => {
+  const login = async (role, userDetails = {}) => {
     const name = userDetails.name || (role === 'Technical Manager' ? 'V. K. Jain' : role === 'Technical Engineer' ? selectedEngineer || 'Mariam Tyagi' : role === 'Sample Cell' ? 'Inward Officer' : role === 'Reporting Manager' ? 'S. P. Yadav' : 'System Admin');
     const engInfo = getEngineerDetails(name);
 
@@ -1717,6 +1740,7 @@ export const WorkflowProvider = ({ children }) => {
     localStorage.setItem('ntb_auth', 'true');
     localStorage.setItem('ntb_user', JSON.stringify(userObj));
     triggerNotification(`Active Role switched to ${userObj.name} (${role})`, 'success');
+    await apiService.login(role, userObj.email);
   };
 
   const logout = () => {
@@ -1793,11 +1817,16 @@ export const WorkflowProvider = ({ children }) => {
         const health = await apiService.checkHealth();
         if (health && health.status === 'ok') {
           setBackendConnected(true);
-          const [apiSamples, apiClarifications, apiManuals, apiLogs] = await Promise.all([
+          const [apiSamples, apiClarifications, apiManuals, apiLogs, apiSeries, apiMaster, apiRequests, apiRMs, apiSecs] = await Promise.all([
             apiService.getSamples(samples),
             apiService.getClarifications(clarifications),
             apiService.getManuals(manuals),
-            apiService.getLogs(logs)
+            apiService.getLogs(logs),
+            apiService.getSeries(baseSeries),
+            apiService.getMasterData(masterData),
+            apiService.getSampleRequests(sampleRequests),
+            apiService.getReportingManagers(reportingManagers),
+            apiService.getSections(sections)
           ]);
 
           if (apiSamples && Array.isArray(apiSamples)) {
@@ -1812,6 +1841,11 @@ export const WorkflowProvider = ({ children }) => {
           }
           if (apiManuals) setManuals(apiManuals);
           if (apiLogs) setLogs(apiLogs);
+          if (apiSeries && Array.isArray(apiSeries) && apiSeries.length > 0) setBaseSeries(apiSeries);
+          if (apiMaster && typeof apiMaster === 'object' && Object.keys(apiMaster).length > 0) setMasterData(apiMaster);
+          if (apiRequests && Array.isArray(apiRequests) && apiRequests.length > 0) setSampleRequests(apiRequests);
+          if (apiRMs && Array.isArray(apiRMs) && apiRMs.length > 0) setReportingManagers(apiRMs);
+          if (apiSecs && Array.isArray(apiSecs) && apiSecs.length > 0) setSections(apiSecs);
         } else {
           setBackendConnected(false);
         }
@@ -2215,7 +2249,6 @@ export const WorkflowProvider = ({ children }) => {
     });
   };
 
-  const [baseSeries] = useState(INITIAL_SERIES);
   const series = baseSeries.map(ser => {
     const keyword = (ser.product || '').split(' ')[0].toLowerCase();
     const linked = samples.filter(s => (s.product || '').toLowerCase().includes(keyword));
@@ -2235,20 +2268,9 @@ export const WorkflowProvider = ({ children }) => {
     };
   });
 
-  const [masterData, setMasterData] = useState(() => {
-    const saved = localStorage.getItem('ntb_master_data');
-    if (!saved) return INITIAL_MASTER_DATA;
-    try {
-      const parsed = JSON.parse(saved);
-      return typeof parsed === 'object' && parsed !== null ? { ...INITIAL_MASTER_DATA, ...parsed } : INITIAL_MASTER_DATA;
-    } catch (e) {
-      return INITIAL_MASTER_DATA;
-    }
-  });
-
   useEffect(() => localStorage.setItem('ntb_master_data', JSON.stringify(masterData)), [masterData]);
 
-  const addMasterItem = (category, item) => {
+  const addMasterItem = async (category, item) => {
     if (!item || !item.trim()) return;
     const cleanItem = item.trim();
     setMasterData(prev => {
@@ -2258,15 +2280,17 @@ export const WorkflowProvider = ({ children }) => {
     });
     triggerNotification(`Added "${cleanItem}" to ${category}`, 'success');
     addLog(`Admin added master data record "${cleanItem}" under ${category}.`);
+    await apiService.addMasterItem(category, cleanItem);
   };
 
-  const deleteMasterItem = (category, itemToDelete) => {
+  const deleteMasterItem = async (category, itemToDelete) => {
     setMasterData(prev => {
       const currentList = prev[category] || [];
       return { ...prev, [category]: currentList.filter(i => i !== itemToDelete) };
     });
     triggerNotification(`Removed "${itemToDelete}" from ${category}`, 'warning');
     addLog(`Admin deleted master data record "${itemToDelete}" from ${category}.`);
+    await apiService.deleteMasterItem(category, itemToDelete);
   };
 
   const engineers = baseEngineers.map(eng => {
@@ -2278,17 +2302,6 @@ export const WorkflowProvider = ({ children }) => {
   });
 
   // Sample Cell Workflow Actions
-  const [sampleRequests, setSampleRequests] = useState(() => {
-    const saved = localStorage.getItem('ntb_sample_requests');
-    if (!saved) return INITIAL_SAMPLE_REQUESTS;
-    try {
-      const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_SAMPLE_REQUESTS;
-    } catch (e) {
-      return INITIAL_SAMPLE_REQUESTS;
-    }
-  });
-
   useEffect(() => localStorage.setItem('ntb_sample_requests', JSON.stringify(sampleRequests)), [sampleRequests]);
 
   const acceptSampleCell = async (sampleId) => {
@@ -2341,64 +2354,81 @@ export const WorkflowProvider = ({ children }) => {
     }));
     triggerNotification(`Test Request #${trId} generated for Sample ${trData.sampleId}`, 'success');
     addLog(`Formal Test Request #${trId} generated and forwarded to Technical Manager.`);
+    await apiService.generateTestRequest(trData);
   };
 
   const handleDispute = async (sampleId, reason) => {
-    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, status: 'Disputed', is_disputed: true, isDisputed: true, dispute_status: 'OPEN', disputeStatus: 'OPEN', disputeReason: reason } : s));
+    const updateObj = { status: 'Disputed', is_disputed: true, isDisputed: true, dispute_status: 'OPEN', disputeStatus: 'OPEN', disputeReason: reason };
+    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, ...updateObj } : s));
     triggerNotification(`Sample ${sampleId} marked as Disputed`, 'warning');
     addLog(`Sample ${sampleId} flagged as Disputed: ${reason}`);
+    await apiService.updateSample(sampleId, updateObj);
   };
 
-  const resolveDispute = (sampleId) => {
-    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, is_disputed: false, isDisputed: false, dispute_status: 'RESOLVED', disputeStatus: 'RESOLVED', status: 'Pending Forwarding' } : s));
+  const resolveDispute = async (sampleId) => {
+    const updateObj = { is_disputed: false, isDisputed: false, dispute_status: 'RESOLVED', disputeStatus: 'RESOLVED', status: 'Pending Forwarding' };
+    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, ...updateObj } : s));
     triggerNotification(`Dispute resolved for Sample ${sampleId}.`, 'success');
     addLog(`Dispute for Sample ${sampleId} marked as RESOLVED by Sample Cell.`);
+    await apiService.updateSample(sampleId, updateObj);
   };
 
   const handleReturnRequest = async (sampleId, reason) => {
     const newReq = { id: `REQ-RET-${Math.floor(100 + Math.random() * 900)}`, sampleId, product: samples.find(s => s.id === sampleId)?.product || 'Sample', type: 'RETURN', requestDate: new Date().toISOString().split('T')[0], reason, status: 'PENDING', requestedBy: 'Applicant' };
     setSampleRequests(prev => [newReq, ...prev]);
-    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, status: 'Return Requests', returnReason: reason } : s));
+    const updateObj = { status: 'Return Requests', returnReason: reason };
+    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, ...updateObj } : s));
     triggerNotification(`Return request logged for ${sampleId}`, 'info');
     addLog(`Return request created for ${sampleId}.`);
+    await apiService.createSampleRequest(newReq);
+    await apiService.updateSample(sampleId, updateObj);
   };
 
   const handleDiscardRequest = async (sampleId, reason) => {
     const newReq = { id: `REQ-DISC-${Math.floor(100 + Math.random() * 900)}`, sampleId, product: samples.find(s => s.id === sampleId)?.product || 'Sample', type: 'DISCARD', requestDate: new Date().toISOString().split('T')[0], reason, status: 'PENDING', requestedBy: 'Lab Officer' };
     setSampleRequests(prev => [newReq, ...prev]);
-    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, status: 'Discard Requests', discardReason: reason } : s));
+    const updateObj = { status: 'Discard Requests', discardReason: reason };
+    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, ...updateObj } : s));
     triggerNotification(`Discard request logged for ${sampleId}`, 'warning');
     addLog(`Discard request logged for ${sampleId}.`);
+    await apiService.createSampleRequest(newReq);
+    await apiService.updateSample(sampleId, updateObj);
   };
 
-  const approveReturnRequest = (reqId) => {
+  const approveReturnRequest = async (reqId) => {
     setSampleRequests(prev => prev.map(r => r.id === reqId ? { ...r, status: 'APPROVED' } : r));
     triggerNotification(`Return Request #${reqId} approved! Sample returned to applicant.`, 'success');
     addLog(`Return Request #${reqId} approved by Sample Cell.`);
+    await apiService.updateSampleRequest(reqId, { status: 'APPROVED' });
   };
 
-  const rejectReturnRequest = (reqId) => {
+  const rejectReturnRequest = async (reqId) => {
     setSampleRequests(prev => prev.map(r => r.id === reqId ? { ...r, status: 'REJECTED' } : r));
     triggerNotification(`Return Request #${reqId} rejected.`, 'warning');
     addLog(`Return Request #${reqId} rejected by Sample Cell.`);
+    await apiService.updateSampleRequest(reqId, { status: 'REJECTED' });
   };
 
-  const approveDiscardRequest = (reqId) => {
+  const approveDiscardRequest = async (reqId) => {
     setSampleRequests(prev => prev.map(r => r.id === reqId ? { ...r, status: 'APPROVED' } : r));
     triggerNotification(`Discard Request #${reqId} approved. Remnant discarded.`, 'success');
     addLog(`Discard Request #${reqId} approved by Sample Cell.`);
+    await apiService.updateSampleRequest(reqId, { status: 'APPROVED' });
   };
 
-  const rejectDiscardRequest = (reqId) => {
+  const rejectDiscardRequest = async (reqId) => {
     setSampleRequests(prev => prev.map(r => r.id === reqId ? { ...r, status: 'REJECTED' } : r));
     triggerNotification(`Discard Request #${reqId} rejected.`, 'warning');
     addLog(`Discard Request #${reqId} rejected by Sample Cell.`);
+    await apiService.updateSampleRequest(reqId, { status: 'REJECTED' });
   };
 
   const withdrawSample = async (sampleId, reason) => {
-    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, status: 'WITHDRAWN', withdrawalReason: reason } : s));
+    const updateObj = { status: 'WITHDRAWN', withdrawalReason: reason };
+    setSamples(prev => prev.map(s => s.id === sampleId ? { ...s, ...updateObj } : s));
     triggerNotification(`Sample ${sampleId} withdrawn`, 'error');
     addLog(`Sample ${sampleId} withdrawn: ${reason}`);
+    await apiService.updateSample(sampleId, updateObj);
   };
 
   return (

@@ -110,27 +110,27 @@ export default function Header({ sidebarOpen, setSidebarOpen, onOpenCommandPalet
       </div>
 
       {/* Locked Active Workstation Session Panel */}
-      <div className="bg-[#f8fafc] border-t border-slate-200 px-3 sm:px-4 md:px-6 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-extrabold tracking-wide uppercase text-[9px] border border-emerald-300">
+      <div className="bg-[#f8fafc] border-t border-slate-200 px-3 sm:px-4 md:px-6 py-1.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 min-w-0">
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-extrabold tracking-wide uppercase text-[9px] border border-emerald-300 shrink-0">
             <Lock size={11} />
             Authenticated
           </div>
           <div
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#f1f5f9] border border-slate-300 text-slate-700 font-medium shadow-2xs min-h-[36px] select-none"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#f1f5f9] border border-slate-300 text-slate-700 font-medium shadow-2xs min-h-[32px] select-none min-w-0 max-w-full"
           >
-            <span className="text-[11px] font-semibold text-slate-500">Workstation:</span>
-            <span className="font-extrabold text-[#1e3a8a] flex items-center gap-1 text-xs truncate max-w-[200px] sm:max-w-none">
+            <span className="text-[11px] font-semibold text-slate-500 shrink-0">Workstation:</span>
+            <span className="font-extrabold text-[#1e3a8a] flex items-center gap-1 text-xs truncate max-w-[220px] sm:max-w-xs md:max-w-md">
               <RoleIcon size={13} className="text-[#f5b041] shrink-0" />
-              {selectedRole === 'Technical Engineer' ? `${activeSection || 'Mechanical'} Engineer (${selectedEngineer})` : `${selectedRole} (${currentUser?.name})`}
+              <span className="truncate">{selectedRole === 'Technical Engineer' ? `${activeSection || 'Mechanical'} Engineer (${selectedEngineer})` : `${selectedRole} (${currentUser?.name})`}</span>
             </span>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 text-[11px] text-slate-500 font-medium pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-200">
+        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 text-[11px] text-slate-500 font-medium pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-200 min-w-0">
           {/* Active Technical Engineer Dropdown */}
           {selectedRole === 'Technical Engineer' && (
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-300 rounded px-2.5 py-1 shadow-2xs min-h-[36px]">
+            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-300 rounded px-2 py-1 shadow-2xs min-h-[32px] max-w-full min-w-0">
               <span className="text-amber-900 font-bold text-[11px] shrink-0">Engineer:</span>
               <select
                 value={selectedEngineer}
@@ -139,7 +139,7 @@ export default function Header({ sidebarOpen, setSidebarOpen, onOpenCommandPalet
                   setSelectedEngineer(engName);
                   login('Technical Engineer', { name: engName, role: 'Technical Engineer' });
                 }}
-                className="bg-transparent text-xs text-amber-950 font-extrabold focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs text-amber-950 font-extrabold focus:outline-none cursor-pointer truncate max-w-[180px] sm:max-w-xs"
                 aria-label="Select Active Technical Engineer"
               >
                 {engineers.map(eng => (

@@ -42,43 +42,43 @@ export default function UserManualView() {
     <div className="flex-1 p-4 md:p-6 space-y-6 pb-20 bg-[#edf3f9] text-slate-800 min-h-full font-sans">
       
       {/* Title Header matching PDF */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-        <div>
-          <h2 className="text-base md:text-lg font-bold text-[#1e3a8a] tracking-tight uppercase flex items-center gap-2">
-            <BookOpen className="text-yellow-500" size={20} />
-            User Manual
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4 min-w-0">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-base md:text-lg font-bold text-[#1e3a8a] tracking-tight uppercase flex items-center gap-2 min-w-0">
+            <BookOpen className="text-yellow-500 shrink-0" size={20} />
+            <span className="truncate">User Manual</span>
           </h2>
-          <p className="text-xs text-slate-500 font-semibold tracking-wide">
+          <p className="text-xs text-slate-500 font-semibold tracking-wide break-words">
             Official NTB Standard Operating Procedures (Linked to NTB Admin Dashboard)
           </p>
         </div>
 
-        <span className="text-xs font-bold text-slate-700 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-2xs self-start sm:self-auto">
+        <span className="text-xs font-bold text-slate-700 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-2xs shrink-0 self-start sm:self-auto">
           {manuals.length} Documents Available
         </span>
       </div>
 
       {/* Admin actions (Upload/Publish new manual) */}
       {selectedRole === 'Admin' && (
-        <div className="bg-white border border-slate-200 rounded-xl p-4 font-semibold text-xs text-slate-800 shadow-2xs">
-          <h3 className="text-[10px] uppercase text-slate-500 font-black mb-2 flex items-center gap-1.5">
-            <Upload size={14} />
-            [Admin Master Controls] Upload & Publish New User Manual
+        <div className="bg-white border border-slate-200 rounded-xl p-4 font-semibold text-xs text-slate-800 shadow-2xs min-w-0">
+          <h3 className="text-[10px] uppercase text-slate-500 font-black mb-2 flex items-center gap-1.5 min-w-0 truncate">
+            <Upload size={14} className="shrink-0" />
+            <span>[Admin Master Controls] Upload & Publish New User Manual</span>
           </h3>
-          <form onSubmit={handleUploadSubmit} className="flex flex-col sm:flex-row gap-3 items-end">
-            <div className="flex-1 w-full">
-              <label className="block text-[10px] text-slate-500 mb-1">User Manual Title / Name</label>
+          <form onSubmit={handleUploadSubmit} className="flex flex-col sm:flex-row gap-3 items-end min-w-0">
+            <div className="flex-1 w-full min-w-0">
+              <label className="block text-[10px] text-slate-500 mb-1 font-bold uppercase">User Manual Title / Name</label>
               <input
                 type="text"
                 placeholder="e.g. SOP for chemical laboratory sample preparation"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-rose-500 focus:outline-none bg-white text-slate-800 font-medium text-xs"
+                className="w-full min-w-0 border border-slate-300 rounded p-2 focus:ring-1 focus:ring-rose-500 focus:outline-none bg-white text-slate-800 font-medium text-xs"
                 required
               />
             </div>
-            <div className="w-full sm:w-64">
-              <label className="block text-[10px] text-slate-500 mb-1">PDF Attachment (Supabase Storage)</label>
+            <div className="w-full sm:w-64 shrink-0">
+              <label className="block text-[10px] text-slate-500 mb-1 font-bold uppercase">PDF Attachment (Supabase Storage)</label>
               <input
                 type="file"
                 accept=".pdf"
@@ -99,72 +99,74 @@ export default function UserManualView() {
       )}
 
       {/* Manuals Table (Matching Page 15 screenshot 100%) */}
-      <div className="bg-white border border-slate-200 rounded shadow-2xs overflow-hidden">
-        <table className="w-full text-left text-xs font-semibold text-slate-800 border-collapse">
-          <tbody className="divide-y divide-slate-200 bg-white">
-            {manuals.map((manual, idx) => (
-              <tr key={manual.id} className="hover:bg-slate-50 transition-colors">
-                {/* S.No */}
-                <td className="p-3.5 text-center font-bold text-slate-900 w-12 border-r border-slate-200">
-                  {idx + 1}.
-                </td>
+      <div className="bg-white border border-slate-200 rounded shadow-2xs overflow-hidden min-w-0">
+        <div className="overflow-x-auto min-w-0">
+          <table className="w-full text-left text-xs font-semibold text-slate-800 border-collapse min-w-0">
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {manuals.map((manual, idx) => (
+                <tr key={manual.id} className="hover:bg-slate-50 transition-colors">
+                  {/* S.No */}
+                  <td className="p-3.5 text-center font-bold text-slate-900 w-12 shrink-0 border-r border-slate-200">
+                    {idx + 1}.
+                  </td>
 
-                {/* Title */}
-                <td className="p-3.5 pl-4">
-                  {isEditing === manual.id ? (
-                    <form onSubmit={(e) => handleEditSubmit(e, manual.id)} className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        className="border border-slate-300 bg-white rounded px-2 py-1 text-xs text-slate-800 font-semibold focus:outline-none flex-1"
-                        required
-                      />
-                      <button type="submit" className="bg-emerald-600 text-white px-2 py-1 rounded font-bold">Save</button>
-                      <button type="button" onClick={() => setIsEditing(null)} className="text-slate-500 hover:underline">Cancel</button>
-                    </form>
-                  ) : (
-                    <span className="text-slate-800 font-semibold leading-normal">{manual.title}</span>
-                  )}
-                </td>
-                
-                {/* Download Button (Matching Screenshot 15 bright blue button) */}
-                <td className="p-3.5 text-right w-48">
-                  <div className="flex items-center justify-end gap-1.5">
-                    
-                    <button
-                      onClick={() => setActiveManual(manual)}
-                      className="bg-[#3b82f6] hover:bg-blue-700 text-white px-3 py-1.5 rounded text-[11px] font-bold shadow-2xs flex items-center gap-1 transition-colors whitespace-nowrap"
-                    >
-                      <span>Download User Manual</span>
-                    </button>
-
-                    {/* Admin Edit/Remove controls */}
-                    {selectedRole === 'Admin' && isEditing !== manual.id && (
-                      <>
-                        <button
-                          onClick={() => { setIsEditing(manual.id); setEditTitle(manual.title); }}
-                          className="p-1.5 border border-slate-200 hover:bg-slate-100 rounded text-indigo-600 transition-colors"
-                          title="Update manual"
-                        >
-                          <Edit2 size={13} />
-                        </button>
-                        <button
-                          onClick={() => { if (window.confirm("Remove this manual permanently?")) deleteUserManual(manual.id); }}
-                          className="p-1.5 border border-slate-200 hover:bg-rose-50 rounded text-rose-600 transition-colors"
-                          title="Remove manual"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </>
+                  {/* Title */}
+                  <td className="p-3.5 pl-4 min-w-0">
+                    {isEditing === manual.id ? (
+                      <form onSubmit={(e) => handleEditSubmit(e, manual.id)} className="flex items-center gap-2 min-w-0">
+                        <input
+                          type="text"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          className="border border-slate-300 bg-white rounded px-2 py-1 text-xs text-slate-800 font-semibold focus:outline-none flex-1 min-w-0"
+                          required
+                        />
+                        <button type="submit" className="bg-emerald-600 text-white px-2 py-1 rounded font-bold shrink-0">Save</button>
+                        <button type="button" onClick={() => setIsEditing(null)} className="text-slate-500 hover:underline shrink-0">Cancel</button>
+                      </form>
+                    ) : (
+                      <span className="text-slate-800 font-semibold leading-normal break-words block min-w-0">{manual.title}</span>
                     )}
+                  </td>
+                  
+                  {/* Download Button (Matching Screenshot 15 bright blue button) */}
+                  <td className="p-3.5 text-right shrink-0">
+                    <div className="flex items-center justify-end gap-1.5 shrink-0">
+                      
+                      <button
+                        onClick={() => setActiveManual(manual)}
+                        className="bg-[#3b82f6] hover:bg-blue-700 text-white px-3 py-1.5 rounded text-[11px] font-bold shadow-2xs flex items-center gap-1 transition-colors whitespace-nowrap shrink-0"
+                      >
+                        <span>Download User Manual</span>
+                      </button>
 
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                      {/* Admin Edit/Remove controls */}
+                      {selectedRole === 'Admin' && isEditing !== manual.id && (
+                        <>
+                          <button
+                            onClick={() => { setIsEditing(manual.id); setEditTitle(manual.title); }}
+                            className="p-1.5 border border-slate-200 hover:bg-slate-100 rounded text-indigo-600 transition-colors shrink-0"
+                            title="Update manual"
+                          >
+                            <Edit2 size={13} />
+                          </button>
+                          <button
+                            onClick={() => { if (window.confirm("Remove this manual permanently?")) deleteUserManual(manual.id); }}
+                            className="p-1.5 border border-slate-200 hover:bg-rose-50 rounded text-rose-600 transition-colors shrink-0"
+                            title="Remove manual"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </>
+                      )}
+
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* PDF READER MODAL */}

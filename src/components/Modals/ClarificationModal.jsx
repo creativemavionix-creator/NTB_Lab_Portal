@@ -125,14 +125,14 @@ export default function ClarificationModal({ sample, clarification, isOpen, onCl
 
           {mode === 'respond' && clarification && (
             <div className="space-y-4">
-              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-slate-800 dark:text-slate-200 space-y-2">
-                <div>
+              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-slate-800 dark:text-slate-200 space-y-2 min-w-0 break-words">
+                <div className="min-w-0">
                   <span className="font-bold block text-[9px] uppercase tracking-wide text-slate-400">Subject</span>
-                  <span className="text-slate-900 dark:text-slate-100 font-bold text-xs">{clarification.subject}</span>
+                  <span className="text-slate-900 dark:text-slate-100 font-bold text-xs break-words">{clarification.subject}</span>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span className="font-bold block text-[9px] uppercase tracking-wide text-slate-400">Query ({clarification.raisedBy})</span>
-                  <p className="text-slate-700 dark:text-slate-300 mt-0.5 whitespace-pre-wrap">{clarification.clarification}</p>
+                  <p className="text-slate-700 dark:text-slate-300 mt-0.5 whitespace-pre-wrap break-words">{clarification.clarification}</p>
                 </div>
                 <div className="text-[10px] text-slate-400 italic">
                   Raised on: {clarification.dateRaised}

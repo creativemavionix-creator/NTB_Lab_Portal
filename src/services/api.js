@@ -138,5 +138,87 @@ export const apiService = {
       method: 'POST',
       body: JSON.stringify({ text: logText })
     }, { id: Date.now(), time: new Date().toLocaleString(), text: logText });
+  },
+
+  // Series / Batches
+  async getSeries(fallback) {
+    const data = await fetchWithFallback('/series', { method: 'GET' }, fallback);
+    return data || fallback;
+  },
+
+  async createSeries(seriesData) {
+    return await fetchWithFallback('/series', {
+      method: 'POST',
+      body: JSON.stringify(seriesData)
+    }, seriesData);
+  },
+
+  async updateSeries(id, updateData) {
+    return await fetchWithFallback(`/series/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData)
+    }, updateData);
+  },
+
+  // Master Data Config
+  async getMasterData(fallback) {
+    const data = await fetchWithFallback('/master-data', { method: 'GET' }, fallback);
+    return data || fallback;
+  },
+
+  async addMasterItem(category, item) {
+    return await fetchWithFallback('/master-data', {
+      method: 'POST',
+      body: JSON.stringify({ category, item })
+    }, null);
+  },
+
+  async deleteMasterItem(category, item) {
+    return await fetchWithFallback('/master-data', {
+      method: 'DELETE',
+      body: JSON.stringify({ category, item })
+    }, null);
+  },
+
+  // Sample Requests (Return & Discard)
+  async getSampleRequests(fallback) {
+    const data = await fetchWithFallback('/sample-requests', { method: 'GET' }, fallback);
+    return data || fallback;
+  },
+
+  async createSampleRequest(reqData) {
+    return await fetchWithFallback('/sample-requests', {
+      method: 'POST',
+      body: JSON.stringify(reqData)
+    }, reqData);
+  },
+
+  async updateSampleRequest(id, updateData) {
+    return await fetchWithFallback(`/sample-requests/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData)
+    }, updateData);
+  },
+
+  // Metadata / Personnel
+  async getEngineers(fallback) {
+    const data = await fetchWithFallback('/engineers', { method: 'GET' }, fallback);
+    return data || fallback;
+  },
+
+  async getOics(fallback) {
+    const data = await fetchWithFallback('/oics', { method: 'GET' }, fallback);
+    return data || fallback;
+  },
+
+  async getReportingManagers(fallback) {
+    const data = await fetchWithFallback('/reporting-managers', { method: 'GET' }, fallback);
+    return data || fallback;
+  },
+
+  async getSections(fallback) {
+    const data = await fetchWithFallback('/sections', { method: 'GET' }, fallback);
+    return data || fallback;
   }
 };
+

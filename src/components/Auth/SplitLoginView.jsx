@@ -1,21 +1,38 @@
 import React, { useState } from 'react';
 import { FlaskConical, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
+import { ROLE_CREDENTIALS, validateRoleCredentials } from '../../config/roleCredentials';
 
 export default function SplitLoginView({ onClose }) {
   const { login, triggerNotification } = useWorkflow();
-  const [employeeId, setEmployeeId] = useState('NTB-SC-101');
-  const [password, setPassword] = useState('••••••••');
-  const [rememberMe, setRememberMe] = useState(true);
   const [role, setRole] = useState('Sample Cell');
+  const [employeeId, setEmployeeId] = useState(ROLE_CREDENTIALS['Sample Cell'].id);
+  const [password, setPassword] = useState(ROLE_CREDENTIALS['Sample Cell'].password);
+  const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRoleChange = (newRole) => {
+    setRole(newRole);
+    const creds = ROLE_CREDENTIALS[newRole];
+    if (creds) {
+      setEmployeeId(creds.id);
+      setPassword(creds.password);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validation = validateRoleCredentials(role, employeeId, password);
+    if (!validation.valid) {
+      triggerNotification(validation.message, 'error');
+      return;
+    }
+
+    const creds = validation.creds;
     try {
       setIsSubmitting(true);
-      await login(role, { id: employeeId, name: role === 'Sample Cell' ? 'Inward Officer' : 'V. K. Jain' });
-      triggerNotification(`Authenticated as ${role} workstation persona`, 'success');
+      await login(role, { id: creds.id, name: creds.name, email: creds.email, avatar: creds.avatar });
+      triggerNotification(`Authenticated as ${role} workstation persona (${creds.name})`, 'success');
       if (onClose) onClose();
     } catch (err) {
       triggerNotification(`Login failed: ${err.message || 'Unknown error'}`, 'error');
@@ -119,7 +136,7 @@ export default function SplitLoginView({ onClose }) {
                 </label>
                 <select
                   value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  onChange={(e) => handleRoleChange(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-amber-50 border border-amber-300 rounded-lg text-xs font-bold text-amber-950 focus:outline-none cursor-pointer"
                 >
                   <option value="Sample Cell">Sample Cell Officer</option>

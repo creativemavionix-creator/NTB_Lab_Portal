@@ -30,12 +30,20 @@ def auth_login():
     role = data.get("role", "Technical Manager")
     email = data.get("email", "")
     
-    # Generate mock session payload
+    role_passwords = {
+        "Technical Manager": "Manager@ntb2026",
+        "Technical Engineer": "Engineer@ntb2026",
+        "Sample Cell": "SampleCell@ntb2026",
+        "Reporting Manager": "ReportManager@ntb2026",
+        "Admin": "Admin@ntb2026"
+    }
+
     user_payload = {
         "authenticated": True,
         "token": f"ntb_token_{int(time.time())}",
         "role": role,
         "email": email,
+        "expectedPassword": role_passwords.get(role, "Admin@ntb2026"),
         "timestamp": time.time()
     }
     return jsonify(user_payload)
@@ -181,7 +189,7 @@ def add_log():
     created = DatabaseManager.add_log(log_item)
     return jsonify(created), 201
 
-# --- MASTER DATA ENDPOINTS ---
+# --- MASTER DATA & METADATA ENDPOINTS ---
 @app.route("/api/engineers", methods=["GET"])
 def get_engineers():
     return jsonify(DatabaseManager.get_engineers())
@@ -189,6 +197,70 @@ def get_engineers():
 @app.route("/api/oics", methods=["GET"])
 def get_oics():
     return jsonify(DatabaseManager.get_oics())
+
+@app.route("/api/reporting-managers", methods=["GET"])
+def get_reporting_managers():
+    return jsonify(DatabaseManager.get_reporting_managers())
+
+@app.route("/api/sections", methods=["GET"])
+def get_sections():
+    return jsonify(DatabaseManager.get_sections())
+
+# --- SERIES ENDPOINTS ---
+@app.route("/api/series", methods=["GET"])
+def get_series():
+    return jsonify(DatabaseManager.get_series())
+
+@app.route("/api/series", methods=["POST"])
+def create_series():
+    data = request.get_json() or {}
+    created = DatabaseManager.create_series(data)
+    return jsonify(created), 201
+
+@app.route("/api/series/<series_id>", methods=["PUT"])
+def update_series(series_id):
+    data = request.get_json() or {}
+    updated = DatabaseManager.update_series(series_id, data)
+    return jsonify(updated)
+
+# --- MASTER DATA CONFIG ENDPOINTS ---
+@app.route("/api/master-data", methods=["GET"])
+def get_master_data():
+    return jsonify(DatabaseManager.get_master_data())
+
+@app.route("/api/master-data", methods=["POST"])
+def add_master_item():
+    data = request.get_json() or {}
+    category = data.get("category")
+    item = data.get("item")
+    updated = DatabaseManager.add_master_item(category, item)
+    return jsonify(updated)
+
+@app.route("/api/master-data", methods=["DELETE"])
+def delete_master_item():
+    data = request.get_json() or {}
+    category = data.get("category")
+    item = data.get("item")
+    updated = DatabaseManager.delete_master_item(category, item)
+    return jsonify(updated)
+
+# --- SAMPLE REQUESTS ENDPOINTS ---
+@app.route("/api/sample-requests", methods=["GET"])
+def get_sample_requests():
+    return jsonify(DatabaseManager.get_sample_requests())
+
+@app.route("/api/sample-requests", methods=["POST"])
+def create_sample_request():
+    data = request.get_json() or {}
+    created = DatabaseManager.create_sample_request(data)
+    return jsonify(created), 201
+
+@app.route("/api/sample-requests/<req_id>", methods=["PUT"])
+def update_sample_request(req_id):
+    data = request.get_json() or {}
+    updated = DatabaseManager.update_sample_request(req_id, data)
+    return jsonify(updated)
+
 
 
 if __name__ == "__main__":

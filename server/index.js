@@ -80,12 +80,23 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/auth/login' && method === 'POST') {
       const body = await getRequestBody(req);
       const role = body.role || 'Technical Manager';
+      const email = body.email || '';
+      
+      const rolePasswords = {
+        'Technical Manager': 'Manager@ntb2026',
+        'Technical Engineer': 'Engineer@ntb2026',
+        'Sample Cell': 'SampleCell@ntb2026',
+        'Reporting Manager': 'ReportManager@ntb2026',
+        'Admin': 'Admin@ntb2026'
+      };
+
       res.writeHead(200);
       res.end(JSON.stringify({
         authenticated: true,
         token: `ntb_token_${Date.now()}`,
         role,
-        email: body.email || '',
+        email,
+        expectedPassword: rolePasswords[role] || 'Admin@ntb2026',
         timestamp: Date.now()
       }));
       return;
@@ -287,15 +298,119 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    // 5. Metadata endpoints (engineers, OICs, logs)
+    // 5. Metadata & Master Data endpoints
+    if (pathname === '/api/series') {
+      if (method === 'GET') {
+        res.writeHead(200);
+        res.end(JSON.stringify(db.series || []));
+        return;
+      }
+      if (method === 'POST') {
+        const body = await getRequestBody(req);
+        const newSeries = { id: body.id || `SER-${Date.now()}`, ...body };
+        if (!db.series) db.series = [];
+        db.series.unshift(newSeries);
+        writeDB(db);
+        res.writeHead(201);
+        res.end(JSON.stringify(newSeries));
+        return;
+      }
+    }
+
+    if (pathname.startsWith('/api/series/')) {
+      const seriesId = pathname.replace('/api/series/', '');
+      const idx = (db.series || []).findIndex(s => s.id === seriesId);
+      if (idx !== -1 && method === 'PUT') {
+        const body = await getRequestBody(req);
+        db.series[idx] = { ...db.series[idx], ...body };
+        writeDB(db);
+        res.writeHead(200);
+        res.end(JSON.stringify(db.series[idx]));
+        return;
+      }
+    }
+
+    if (pathname === '/api/master-data') {
+      if (method === 'GET') {
+        res.writeHead(200);
+        res.end(JSON.stringify(db.masterData || {}));
+        return;
+      }
+      if (method === 'POST') {
+        const body = await getRequestBody(req);
+        const { category, item } = body;
+        if (category && item && db.masterData && Array.isArray(db.masterData[category])) {
+          if (!db.masterData[category].includes(item)) {
+            db.masterData[category].push(item);
+            writeDB(db);
+          }
+        }
+        res.writeHead(200);
+        res.end(JSON.stringify(db.masterData));
+        return;
+      }
+      if (method === 'DELETE') {
+        const body = await getRequestBody(req);
+        const { category, item } = body;
+        if (category && item && db.masterData && Array.isArray(db.masterData[category])) {
+          db.masterData[category] = db.masterData[category].filter(i => i !== item);
+          writeDB(db);
+        }
+        res.writeHead(200);
+        res.end(JSON.stringify(db.masterData));
+        return;
+      }
+    }
+
+    if (pathname === '/api/sample-requests') {
+      if (method === 'GET') {
+        res.writeHead(200);
+        res.end(JSON.stringify(db.sampleRequests || []));
+        return;
+      }
+      if (method === 'POST') {
+        const body = await getRequestBody(req);
+        const newReq = { id: body.id || `REQ-${Date.now()}`, ...body };
+        if (!db.sampleRequests) db.sampleRequests = [];
+        db.sampleRequests.unshift(newReq);
+        writeDB(db);
+        res.writeHead(201);
+        res.end(JSON.stringify(newReq));
+        return;
+      }
+    }
+
+    if (pathname.startsWith('/api/sample-requests/')) {
+      const reqId = pathname.replace('/api/sample-requests/', '');
+      const idx = (db.sampleRequests || []).findIndex(r => r.id === reqId);
+      if (idx !== -1 && method === 'PUT') {
+        const body = await getRequestBody(req);
+        db.sampleRequests[idx] = { ...db.sampleRequests[idx], ...body };
+        writeDB(db);
+        res.writeHead(200);
+        res.end(JSON.stringify(db.sampleRequests[idx]));
+        return;
+      }
+    }
+
     if (pathname === '/api/engineers' && method === 'GET') {
       res.writeHead(200);
-      res.end(JSON.stringify(db.engineers));
+      res.end(JSON.stringify(db.engineers || []));
       return;
     }
     if (pathname === '/api/oics' && method === 'GET') {
       res.writeHead(200);
-      res.end(JSON.stringify(db.oics));
+      res.end(JSON.stringify(db.oics || []));
+      return;
+    }
+    if (pathname === '/api/reporting-managers' && method === 'GET') {
+      res.writeHead(200);
+      res.end(JSON.stringify(db.reportingManagers || []));
+      return;
+    }
+    if (pathname === '/api/sections' && method === 'GET') {
+      res.writeHead(200);
+      res.end(JSON.stringify(db.sections || []));
       return;
     }
     if (pathname === '/api/logs') {

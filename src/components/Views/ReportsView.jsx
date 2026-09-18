@@ -101,19 +101,19 @@ export default function ReportsView({ subView }) {
     <div className="flex-1 p-4 md:p-6 space-y-4 pb-20 bg-[#edf3f9] text-slate-800 min-h-full font-sans text-xs">
       
       {/* Title Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2">
-        <h2 className="text-sm font-extrabold text-[#1e3a8a] uppercase tracking-tight">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2 min-w-0">
+        <h2 className="text-sm font-extrabold text-[#1e3a8a] uppercase tracking-tight truncate min-w-0 flex-1">
           {activeSubViewName === 'Testing Section Report' && 'REPORT BY TESTING SECTION - NATIONAL TESTING BUREAU'}
           {activeSubViewName === 'OIC Testing Report' && 'REPORT BY OIC TESTING - NATIONAL TESTING BUREAU'}
           {activeSubViewName === 'Testing Person Report' && `SYSTEM REPORT - TESTING PERSON PERFORMANCE (${targetEngName})`}
         </h2>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
           {selectedRole !== 'Technical Engineer' && activeSubViewName === 'Testing Person Report' && (
             <select
               value={activeEngSelection}
               onChange={(e) => setActiveEngSelection(e.target.value)}
-              className="border border-slate-300 rounded p-1 bg-white text-xs font-bold text-slate-800"
+              className="border border-slate-300 rounded p-1 bg-white text-xs font-bold text-slate-800 shrink-0 max-w-[200px] truncate"
             >
               {engineers.map(e => (
                 <option key={e.id} value={e.name}>{e.name} ({e.section})</option>
@@ -121,7 +121,7 @@ export default function ReportsView({ subView }) {
             </select>
           )}
           <span 
-            className="text-[11px] text-slate-500 font-semibold cursor-pointer hover:underline" 
+            className="text-[11px] text-slate-500 font-semibold cursor-pointer hover:underline shrink-0" 
             onClick={() => { setFromDate(''); setToDate(''); setTestTypeFilter(''); setStatusFilter(''); setSearchQuery(''); }}
           >
             Reset Filters

@@ -239,3 +239,91 @@ class DatabaseManager:
     def get_oics():
         db = load_local_db()
         return db.get("oics", [])
+
+    @staticmethod
+    def get_reporting_managers():
+        db = load_local_db()
+        return db.get("reportingManagers", [])
+
+    @staticmethod
+    def get_sections():
+        db = load_local_db()
+        return db.get("sections", [])
+
+    @staticmethod
+    def get_series():
+        db = load_local_db()
+        return db.get("series", [])
+
+    @staticmethod
+    def create_series(series_data):
+        db = load_local_db()
+        if "series" not in db:
+            db["series"] = []
+        db["series"].insert(0, series_data)
+        save_local_db(db)
+        return series_data
+
+    @staticmethod
+    def update_series(series_id, update_data):
+        db = load_local_db()
+        updated = None
+        for i, s in enumerate(db.get("series", [])):
+            if s.get("id") == series_id:
+                db["series"][i] = {**s, **update_data}
+                updated = db["series"][i]
+                break
+        save_local_db(db)
+        return updated or update_data
+
+    @staticmethod
+    def get_master_data():
+        db = load_local_db()
+        return db.get("masterData", {})
+
+    @staticmethod
+    def add_master_item(category, item):
+        db = load_local_db()
+        if "masterData" not in db:
+            db["masterData"] = {}
+        if category not in db["masterData"]:
+            db["masterData"][category] = []
+        if item not in db["masterData"][category]:
+            db["masterData"][category].append(item)
+            save_local_db(db)
+        return db["masterData"]
+
+    @staticmethod
+    def delete_master_item(category, item):
+        db = load_local_db()
+        if "masterData" in db and category in db["masterData"]:
+            db["masterData"][category] = [i for i in db["masterData"][category] if i != item]
+            save_local_db(db)
+        return db.get("masterData", {})
+
+    @staticmethod
+    def get_sample_requests():
+        db = load_local_db()
+        return db.get("sampleRequests", [])
+
+    @staticmethod
+    def create_sample_request(req_data):
+        db = load_local_db()
+        if "sampleRequests" not in db:
+            db["sampleRequests"] = []
+        db["sampleRequests"].insert(0, req_data)
+        save_local_db(db)
+        return req_data
+
+    @staticmethod
+    def update_sample_request(req_id, update_data):
+        db = load_local_db()
+        updated = None
+        for i, r in enumerate(db.get("sampleRequests", [])):
+            if r.get("id") == req_id:
+                db["sampleRequests"][i] = {**r, **update_data}
+                updated = db["sampleRequests"][i]
+                break
+        save_local_db(db)
+        return updated or update_data
+

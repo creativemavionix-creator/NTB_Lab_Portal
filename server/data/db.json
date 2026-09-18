@@ -189,8 +189,9 @@
       "reportNumber": null,
       "reportDate": null,
       "reportingManager": null,
-      "status": "Samples Allocated",
-      "type": "Supplementary"
+      "status": "Pending",
+      "type": "Supplementary",
+      "acceptedDate": "2026-09-18"
     },
     {
       "id": "SUPP-26M902",
@@ -304,7 +305,7 @@
       "reason": "Applicant requested re-testing for high-temperature valve seat endurance.",
       "requestedBy": "Suraksha Quality Manager",
       "requestDate": "2026-01-20",
-      "requiredTests": "Endurance Test at 120\u00b0C",
+      "requiredTests": "Endurance Test at 120°C",
       "documents": [
         "Retest_Request_8801.pdf"
       ],
@@ -569,7 +570,7 @@
       "testRequestId": "TR-103",
       "allocationDate": "2026-01-27",
       "dueDate": "2026-02-15",
-      "testResults": "Passed hydrostatic test at 3.0 kg/cm\u00b2 pressure without deformation.",
+      "testResults": "Passed hydrostatic test at 3.0 kg/cm² pressure without deformation.",
       "testDate": "2026-05-05",
       "resultStatus": "Completed",
       "verificationStatus": "Pending Verification",
@@ -662,7 +663,7 @@
       "testRequestId": "TR-8819",
       "allocationDate": "2026-01-19",
       "dueDate": "2026-02-05",
-      "testResults": "Verified accurate within \u00b10.5% full scale.",
+      "testResults": "Verified accurate within ±0.5% full scale.",
       "testDate": "2026-02-01",
       "resultStatus": "Completed",
       "verificationStatus": "Verified",
@@ -1024,7 +1025,7 @@
       "forwardedOn": "2026-01-31",
       "quantity": "2.000",
       "standard": "IS 374 (2022)",
-      "requiredTests": "Air Delivery (230 m\u00b3/min) & Power Consumption",
+      "requiredTests": "Air Delivery (230 m³/min) & Power Consumption",
       "documents": [
         "Atomberg_Fan_Spec.pdf"
       ],
@@ -1086,7 +1087,7 @@
       "forwardedOn": "2026-01-18",
       "quantity": "90.00",
       "standard": "IS 694 (2022)",
-      "requiredTests": "Conductor Resistance (12.1 \u03a9/km) & Flame Retardance",
+      "requiredTests": "Conductor Resistance (12.1 Ω/km) & Flame Retardance",
       "documents": [
         "Finolex_Wire_Doc.pdf"
       ],
@@ -1098,7 +1099,7 @@
       "testRequestId": "TR-ELEC-307",
       "allocationDate": "2026-01-19",
       "dueDate": "2026-02-08",
-      "testResults": "Conductor resistance 11.8 \u03a9/km (spec < 12.1 \u03a9/km). Oxygen index 32% (FR grade). Passed.",
+      "testResults": "Conductor resistance 11.8 Ω/km (spec < 12.1 Ω/km). Oxygen index 32% (FR grade). Passed.",
       "testDate": "2026-01-30",
       "resultStatus": "Completed",
       "verificationStatus": "Verified",
@@ -1273,7 +1274,7 @@
       "forwardedOn": "2026-01-27",
       "quantity": "2.000",
       "standard": "IS 14286 (2020)",
-      "requiredTests": "Thermal Cycling -40\u00b0C to +85\u00b0C & Damp Heat Test",
+      "requiredTests": "Thermal Cycling -40°C to +85°C & Damp Heat Test",
       "documents": [
         "Tata_Solar_Inward.pdf"
       ],
@@ -1316,7 +1317,7 @@
       "testRequestId": "TR-ELEC-406",
       "allocationDate": "2026-01-15",
       "dueDate": "2026-02-05",
-      "testResults": "Cut-off response time 18ms. Output regulation 220V \u00b1 5% across 90V-280V input range.",
+      "testResults": "Cut-off response time 18ms. Output regulation 220V ± 5% across 90V-280V input range.",
       "testDate": "2026-01-28",
       "resultStatus": "Completed",
       "verificationStatus": "Verified",
@@ -1791,7 +1792,165 @@
       "section": "Electrical"
     }
   ],
+  "series": [
+    {
+      "id": "SER-2026-001",
+      "product": "Domestic LPG Cylinder Valves",
+      "applicant": "Suraksha Gas Components",
+      "requestDate": "2026-01-15",
+      "sampleCount": 5,
+      "completedReports": 4,
+      "pendingReports": 1,
+      "status": "Pending Reports"
+    },
+    {
+      "id": "SER-2026-002",
+      "product": "Armoured XLPE Underground Cables",
+      "applicant": "Polycab Wires Pvt Ltd.",
+      "requestDate": "2026-01-20",
+      "sampleCount": 10,
+      "completedReports": 10,
+      "pendingReports": 0,
+      "status": "Final Reports"
+    },
+    {
+      "id": "SER-2026-003",
+      "product": "Packaged Mineral Water Bottles (500ml)",
+      "applicant": "Bisleri International Pvt Ltd.",
+      "requestDate": "2026-02-01",
+      "sampleCount": 8,
+      "completedReports": 0,
+      "pendingReports": 8,
+      "status": "Pending Requests"
+    }
+  ],
+  "masterData": {
+    "laboratories": [
+      "Mechanical Laboratory",
+      "Chemical Laboratory",
+      "Electrical Laboratory",
+      "Electronics Laboratory",
+      "Biological Laboratory"
+    ],
+    "sampleTypes": [
+      "Domestic Gas Stove",
+      "LPG Regulator",
+      "Rubber Hose Pipe",
+      "Pressure Cooker",
+      "Water Motor Pump",
+      "Insulated Bottle",
+      "Electrical Cable",
+      "Smart Meter",
+      "Mineral Water Jar",
+      "LED Fixture"
+    ],
+    "standards": [
+      "IS 4246 (2025)",
+      "IS 2347 (2023)",
+      "IS 694 (2022)",
+      "IS 14220 (2022)",
+      "IS 17526 (2021)",
+      "IS 16444 (2020)",
+      "IS 14543 (2024)",
+      "IS 16107 (2021)"
+    ],
+    "testTypes": [
+      "Routine Testing",
+      "Type Testing",
+      "Audit Verification",
+      "Endurance & Thermal Test",
+      "Bursting & Hydrostatic Pressure",
+      "Surge & Impulse Voltage",
+      "Microbial Culture Test"
+    ],
+    "testParameters": [
+      "Hydrostatic Pressure Burst",
+      "Thermal Efficiency",
+      "Flame Resistance",
+      "Conductor Resistance",
+      "EMC Emission",
+      "Coliform & E. Coli",
+      "Voltage Surge 10kV",
+      "Insulation Resistance"
+    ]
+  },
+  "sampleRequests": [
+    {
+      "id": "REQ-RET-101",
+      "sampleId": "26M-DISP-01",
+      "product": "Automotive Engine Oil Filter (Heavy Duty)",
+      "type": "RETURN",
+      "requestDate": "2026-02-05",
+      "reason": "Applicant requested return of physical sample after non-destructive test.",
+      "status": "PENDING",
+      "requestedBy": "Bosch QC Head"
+    },
+    {
+      "id": "REQ-RET-102",
+      "sampleId": "25M3AFE89",
+      "product": "Domestic Gas Stove",
+      "type": "RETURN",
+      "requestDate": "2026-02-06",
+      "reason": "Return requested for auditing secondary valve component.",
+      "status": "PENDING",
+      "requestedBy": "Apex Quality Team"
+    },
+    {
+      "id": "REQ-DISC-201",
+      "sampleId": "26M-ALLOC-01",
+      "product": "Stainless Steel Water Flask (1000ml)",
+      "type": "DISCARD",
+      "requestDate": "2026-02-04",
+      "reason": "Sample ruptured during destructive hydrostatic pressure test; hazardous remnant disposal requested.",
+      "status": "PENDING",
+      "requestedBy": "Chemical Testing Section"
+    },
+    {
+      "id": "REQ-DISC-202",
+      "sampleId": "SUPP-26M902",
+      "product": "LPG Hose Pipe (High Density Rubber Batch)",
+      "type": "DISCARD",
+      "requestDate": "2026-02-07",
+      "reason": "Post-test rubber debris disposal authorized by section supervisor.",
+      "status": "PENDING",
+      "requestedBy": "Harendra Singh (Eng)"
+    }
+  ],
+  "reportingManagers": [
+    {
+      "id": "rm-1",
+      "name": "S. P. Yadav",
+      "email": "sp.yadav@ntb.gov.in"
+    },
+    {
+      "id": "rm-2",
+      "name": "Neha Chaudhry",
+      "email": "neha.c@ntb.gov.in"
+    }
+  ],
+  "sections": [
+    "Mechanical",
+    "Chemical",
+    "Electrical",
+    "Electronics",
+    "Biological"
+  ],
   "logs": [
+    {
+      "id": 1789748741211,
+      "time": "18/9/2026, 9:55:41 pm",
+      "text": "Testing started for sample SUPP-26M901."
+    },
+    {
+      "id": 1789748736029,
+      "time": "18/9/2026, 9:55:36 pm",
+      "text": "Sample SUPP-26M901 updated (Status: Pending)."
+    },
+    {
+      "id": 1789748735966,
+      "time": "18/9/2026, 9:55:35 pm",
+      "text": "Sample SUPP-26M901 accepted by Technical Engineer."
+    },
     {
       "id": 1789288925847,
       "time": "2026-09-13 14:12:05",
@@ -1801,24 +1960,6 @@
       "id": 1789287871750,
       "time": "2026-09-13 13:54:31",
       "text": "Sample 25M3AFE89 allocated to Mariam Tyagi (Mechanical)."
-    },
-    {
-      "id": 1789287863728,
-      "time": "2026-09-13 13:54:23",
-      "text": "Sample REQ-DISC-201 allocated to Mariam Tyagi (Mechanical)."
-    },
-    {
-      "id": 1789287848778,
-      "time": "2026-09-13 13:54:08",
-      "text": "Sample REQ-DISC-201 allocated to Mariam Tyagi (Mechanical)."
-    },
-    {
-      "id": 1,
-      "time": "12/9/2026, 11:32:12 pm",
-      "text": "System initialized with REST API Database persistence."
-    }
-  ]
-}echanical)."
     },
     {
       "id": 1,

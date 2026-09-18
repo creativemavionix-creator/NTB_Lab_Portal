@@ -213,18 +213,18 @@ export default function MetricCards({ onCardClick }) {
             type="button"
             key={card.id}
             onClick={() => onCardClick('Sample Handling', card.subView)}
-            className={`flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-2xs hover:shadow-md transition-all text-left group cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none ${card.color}`}
+            className={`flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-2xs hover:shadow-md transition-all text-left group cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none min-w-0 ${card.color}`}
             aria-label={`View ${card.title} (${count} items)`}
           >
-            <div className="flex flex-col gap-1 pr-2">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-800 transition-colors">
+            <div className="flex flex-col gap-1 pr-2 min-w-0 flex-1 overflow-hidden">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-800 transition-colors truncate">
                 {card.title}
               </span>
               <span className="text-2xl font-black text-slate-900 tracking-tight mt-1">
                 {count}
               </span>
             </div>
-            <div className="p-3 bg-white rounded-full border border-slate-100 shadow-2xs group-hover:scale-110 transition-transform">
+            <div className="p-3 bg-white rounded-full border border-slate-100 shadow-2xs group-hover:scale-110 transition-transform shrink-0">
               <Icon size={20} className="stroke-[2]" />
             </div>
           </button>

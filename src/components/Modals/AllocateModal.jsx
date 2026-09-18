@@ -23,13 +23,9 @@ export default function AllocateModal({ sample, isOpen, onClose }) {
       setDueDate(sample.dueDate || defaultDate.toISOString().split('T')[0]);
       
       const secEngineers = engineers.filter(e => e.section === sec);
-      if (secEngineers.length > 0) {
-        setSelectedEng(secEngineers[0].name);
-      } else {
-        setSelectedEng('');
-      }
+      setSelectedEng(secEngineers.length > 0 ? secEngineers[0].name : '');
     }
-  }, [sample, isOpen, engineers]);
+  }, [sample?.id, isOpen]);
 
   const handleSectionChange = (newSec) => {
     setSelectedSection(newSec);
@@ -78,8 +74,8 @@ export default function AllocateModal({ sample, isOpen, onClose }) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs font-medium text-slate-800 dark:text-slate-200">
           <div>
             <span className="text-[10px] text-slate-400 uppercase font-bold">Sample Metadata</span>
-            <div className="mt-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-1 text-slate-700 dark:text-slate-300">
-              <div><span className="font-bold text-slate-900 dark:text-slate-100">Code:</span> {sample.id}</div>
+            <div className="mt-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-1 text-slate-700 dark:text-slate-300 min-w-0 break-words">
+              <div><span className="font-bold text-slate-900 dark:text-slate-100">Code:</span> <span className="font-mono font-bold text-indigo-700 dark:text-indigo-400">{sample.id}</span></div>
               <div><span className="font-bold text-slate-900 dark:text-slate-100">Product:</span> {sample.product}</div>
               <div><span className="font-bold text-slate-900 dark:text-slate-100">Standard:</span> {sample.standard}</div>
               <div><span className="font-bold text-slate-900 dark:text-slate-100">Tests:</span> {sample.requiredTests}</div>
