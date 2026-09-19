@@ -71,7 +71,47 @@ export const ROLE_CREDENTIALS = {
 };
 
 /**
- * Validate role credentials by Employee ID or Email
+ * Authenticate user directly by Employee ID or Email, auto-detecting their workstation persona
+ */
+export function authenticateUserCredentials(identifier, password) {
+  const inputId = (identifier || '').trim().toLowerCase();
+  const inputPwd = (password || '').trim();
+
+  if (!inputId) {
+    return { valid: false, message: 'Please enter your Employee ID or Official Email.' };
+  }
+
+  // Find matching credential profile by ID or Email
+  const matchedKey = Object.keys(ROLE_CREDENTIALS).find(key => {
+    const cred = ROLE_CREDENTIALS[key];
+    return cred.id.toLowerCase() === inputId || cred.email.toLowerCase() === inputId;
+  });
+
+  if (!matchedKey) {
+    return { 
+      valid: false, 
+      message: `No profile found for '${identifier}'. Valid Employee IDs: TM-201, ENG-101, SC-101, RM-301, ADM-001.` 
+    };
+  }
+
+  const creds = ROLE_CREDENTIALS[matchedKey];
+
+  if (!inputPwd) {
+    return { valid: false, message: `Please enter the password for ${creds.role} (${creds.name}).` };
+  }
+
+  if (inputPwd !== creds.password) {
+    return { 
+      valid: false, 
+      message: `Incorrect password for ${creds.role} (${creds.name}). Hint: '${creds.password}'` 
+    };
+  }
+
+  return { valid: true, creds };
+}
+
+/**
+ * Validate role credentials by Employee ID or Email (backwards compatibility)
  */
 export function validateRoleCredentials(role, identifier, password) {
   const target = ROLE_CREDENTIALS[role];

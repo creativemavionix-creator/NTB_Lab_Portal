@@ -1,23 +1,18 @@
 import React, { useState } from 'react';
 import { FlaskConical, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
-import { validateRoleCredentials } from '../../config/roleCredentials';
+import { authenticateUserCredentials } from '../../config/roleCredentials';
 
 export default function SplitLoginView({ onClose }) {
   const { login, triggerNotification } = useWorkflow();
-  const [role, setRole] = useState('Sample Cell');
   const [employeeId, setEmployeeId] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleRoleChange = (newRole) => {
-    setRole(newRole);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validation = validateRoleCredentials(role, employeeId, password);
+    const validation = authenticateUserCredentials(employeeId, password);
     if (!validation.valid) {
       triggerNotification(validation.message, 'error');
       return;
@@ -26,8 +21,8 @@ export default function SplitLoginView({ onClose }) {
     const creds = validation.creds;
     try {
       setIsSubmitting(true);
-      await login(role, { id: creds.id, name: creds.name, email: creds.email, avatar: creds.avatar });
-      triggerNotification(`Authenticated as ${role} workstation persona (${creds.name})`, 'success');
+      await login(creds.role, { id: creds.id, name: creds.name, email: creds.email, avatar: creds.avatar });
+      triggerNotification(`Authenticated as ${creds.role} (${creds.name})`, 'success');
       if (onClose) onClose();
     } catch (err) {
       triggerNotification(`Login failed: ${err.message || 'Unknown error'}`, 'error');
@@ -93,21 +88,21 @@ export default function SplitLoginView({ onClose }) {
             <div>
               <h3 className="text-xl font-black text-[#1e293b]">Welcome Back</h3>
               <p className="text-xs text-slate-500 font-medium mt-1">
-                Sign in to access the NTB Sample Cell Portal workstation
+                Enter your Employee ID or Email and Password to access your workstation
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Employee ID
+                  Employee ID or Official Email
                 </label>
                 <input
                   type="text"
                   value={employeeId}
                   onChange={(e) => setEmployeeId(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:ring-2 focus:ring-[#f59e0b] focus:outline-none"
-                  placeholder="Enter Employee ID (e.g. NTB-SC-101)"
+                  placeholder="e.g. TM-201, ENG-101, SC-101, RM-301, ADM-001"
                   required
                 />
               </div>
@@ -121,25 +116,9 @@ export default function SplitLoginView({ onClose }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:ring-2 focus:ring-[#f59e0b] focus:outline-none"
+                  placeholder="••••••••••••"
                   required
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Target Workstation Role
-                </label>
-                <select
-                  value={role}
-                  onChange={(e) => handleRoleChange(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-amber-50 border border-amber-300 rounded-lg text-xs font-bold text-amber-950 focus:outline-none cursor-pointer"
-                >
-                  <option value="Sample Cell">Sample Cell Officer</option>
-                  <option value="Technical Manager">Technical Manager</option>
-                  <option value="Technical Engineer">Technical Engineer</option>
-                  <option value="Reporting Manager">Reporting Manager</option>
-                  <option value="Admin">System Admin</option>
-                </select>
               </div>
 
               <div className="flex items-center justify-between text-xs font-semibold pt-1">

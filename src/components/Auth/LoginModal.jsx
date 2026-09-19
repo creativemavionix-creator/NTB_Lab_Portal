@@ -1,43 +1,32 @@
 import React, { useState } from 'react';
-import { ShieldCheck, UserCheck, Settings, Users, LogIn, Lock, Mail, X, CheckCircle, ArrowRight } from 'lucide-react';
+import { LogIn, Lock, Mail, X } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
 import { authService } from '../../services/authService';
 import { isSupabaseConfigured } from '../../services/supabaseClient';
-import { ROLE_CREDENTIALS, validateRoleCredentials } from '../../config/roleCredentials';
+import { authenticateUserCredentials } from '../../config/roleCredentials';
 
 export default function LoginModal({ isOpen, onClose }) {
   const { login, triggerNotification } = useWorkflow();
-  const [selectedRole, setSelectedRole] = useState('Technical Manager');
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const roleOptions = Object.values(ROLE_CREDENTIALS).map(r => ({
-    ...r,
-    icon: r.role === 'Technical Manager' ? ShieldCheck : r.role === 'Technical Engineer' ? Users : r.role === 'Sample Cell' ? UserCheck : Settings
-  }));
-
-  const activeRoleData = ROLE_CREDENTIALS[selectedRole] || ROLE_CREDENTIALS['Technical Manager'];
-
-  const handleRoleSelect = (item) => {
-    setSelectedRole(item.role);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const userEmail = email.trim();
 
-    const validation = validateRoleCredentials(selectedRole, userEmail, password);
-    if (!validation.valid) {
-      triggerNotification(validation.message, 'error');
+    const authResult = authenticateUserCredentials(identifier, password);
+    if (!authResult.valid) {
+      triggerNotification(authResult.message, 'error');
       return;
     }
 
+    const creds = authResult.creds;
+
     if (isSupabaseConfigured && password) {
       setIsLoading(true);
-      const { user, error } = await authService.signIn(userEmail, password);
+      const { user, error } = await authService.signIn(creds.email, password);
       setIsLoading(false);
 
       if (error) {
@@ -48,12 +37,13 @@ export default function LoginModal({ isOpen, onClose }) {
       }
     }
 
-    await login(selectedRole, {
-      id: activeRoleData.id,
-      name: activeRoleData.name,
-      email: userEmail || activeRoleData.email,
-      avatar: activeRoleData.avatar
+    await login(creds.role, {
+      id: creds.id,
+      name: creds.name,
+      email: creds.email,
+      avatar: creds.avatar
     });
+    triggerNotification(`Authenticated as ${creds.role} (${creds.name})`, 'success');
     onClose();
   };
 
@@ -63,7 +53,7 @@ export default function LoginModal({ isOpen, onClose }) {
         className="fixed inset-0" 
         onClick={onClose} 
       />
-      <div className="relative w-full max-w-2xl bg-white rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-10 flex flex-col my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh]">
+      <div className="relative w-full max-w-md bg-white rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-10 flex flex-col my-0 sm:my-auto max-h-[94vh] sm:max-h-[90vh]">
         
         {/* Modal Header */}
         <div className="bg-[#1e3a8a] text-white p-3.5 sm:p-5 flex items-center justify-between shrink-0">
@@ -73,10 +63,10 @@ export default function LoginModal({ isOpen, onClose }) {
             </div>
             <div>
               <h2 className="text-sm sm:text-base md:text-lg font-bold tracking-tight">
-                NTB Portal Multi-Role Login
+                NTB Portal Workstation Login
               </h2>
               <p className="text-blue-100 text-[10px] sm:text-xs font-medium">
-                Select your accredited workstation role to authenticate
+                Enter your Employee ID or Email and Password to sign in
               </p>
             </div>
           </div>
@@ -91,63 +81,20 @@ export default function LoginModal({ isOpen, onClose }) {
         </div>
 
         {/* Modal Body */}
-        <div className="p-3.5 sm:p-5 md:p-6 overflow-y-auto space-y-3.5 sm:space-y-6 text-xs text-slate-800 scrollbar-thin">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs text-slate-800 scrollbar-thin">
           
-          {/* Role Cards Selection */}
-          <div>
-            <label className="block text-[10px] uppercase font-bold tracking-wider text-slate-500 mb-1.5">
-              Select Workstation Persona / Role
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
-              {roleOptions.map((item) => {
-                const isSelected = selectedRole === item.role;
-                return (
-                  <button
-                    key={item.role}
-                    type="button"
-                    onClick={() => handleRoleSelect(item)}
-                    className={`p-2.5 sm:p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer touch-manipulation min-h-[72px] ${
-                      isSelected 
-                        ? `${item.color} shadow-sm ring-2 ring-indigo-500/40 font-bold`
-                        : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold ${item.badgeColor}`}>
-                        {item.role}
-                      </span>
-                      {isSelected && <CheckCircle size={13} className="text-indigo-600 shrink-0" />}
-                    </div>
-
-                    <div>
-                      <div className="font-extrabold text-[11px] sm:text-xs text-slate-900 truncate">{item.name}</div>
-                      <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium truncate">{item.title}</div>
-                    </div>
-
-                    <div className="mt-1 pt-1 border-t border-slate-200/60 flex items-center justify-between text-[8px] sm:text-[9px] font-semibold text-slate-500">
-                      <span>Select</span>
-                      <ArrowRight size={10} />
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* Credentials Form */}
-          <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3 border-t border-slate-200 pt-3 sm:pt-4">
-            <div className="font-bold text-slate-900 text-xs">Official Account Credentials</div>
-            
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-[10px] text-slate-500 font-bold mb-1 uppercase">Official Email Address</label>
+              <label className="block text-[10px] text-slate-500 font-bold mb-1 uppercase">Employee ID or Official Email</label>
               <div className="relative">
-                <Mail size={16} className="absolute left-3 top-2.5 text-slate-400" />
+                <Mail size={16} className="absolute left-3 top-3 text-slate-400" />
                 <input
                   type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter Employee ID or Email (e.g. TM-201 or vk.jain@ntb.gov.in)"
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[40px]"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="e.g. TM-201, ENG-101, SC-101, RM-301, ADM-001"
+                  className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[42px]"
                   required
                 />
               </div>
@@ -156,13 +103,14 @@ export default function LoginModal({ isOpen, onClose }) {
             <div>
               <label className="block text-[10px] text-slate-500 font-bold mb-1 uppercase">Password</label>
               <div className="relative">
-                <Lock size={16} className="absolute left-3 top-2.5 text-slate-400" />
+                <Lock size={16} className="absolute left-3 top-3 text-slate-400" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[40px]"
+                  className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[42px]"
+                  required
                 />
               </div>
             </div>
@@ -180,7 +128,7 @@ export default function LoginModal({ isOpen, onClose }) {
               ) : (
                 <>
                   <LogIn size={16} />
-                  <span>Authenticate & Open Workstation</span>
+                  <span>Sign In & Open Workstation</span>
                 </>
               )}
             </button>
