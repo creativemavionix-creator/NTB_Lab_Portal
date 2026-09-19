@@ -1,23 +1,18 @@
 import React, { useState } from 'react';
 import { FlaskConical, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useWorkflow } from '../../context/WorkflowContext';
-import { ROLE_CREDENTIALS, validateRoleCredentials } from '../../config/roleCredentials';
+import { validateRoleCredentials } from '../../config/roleCredentials';
 
 export default function SplitLoginView({ onClose }) {
   const { login, triggerNotification } = useWorkflow();
   const [role, setRole] = useState('Sample Cell');
-  const [employeeId, setEmployeeId] = useState(ROLE_CREDENTIALS['Sample Cell'].id);
-  const [password, setPassword] = useState(ROLE_CREDENTIALS['Sample Cell'].password);
+  const [employeeId, setEmployeeId] = useState('');
+  const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleRoleChange = (newRole) => {
     setRole(newRole);
-    const creds = ROLE_CREDENTIALS[newRole];
-    if (creds) {
-      setEmployeeId(creds.id);
-      setPassword(creds.password);
-    }
   };
 
   const handleSubmit = async (e) => {

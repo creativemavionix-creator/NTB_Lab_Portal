@@ -8,8 +8,8 @@ import { ROLE_CREDENTIALS, validateRoleCredentials } from '../../config/roleCred
 export default function LoginModal({ isOpen, onClose }) {
   const { login, triggerNotification } = useWorkflow();
   const [selectedRole, setSelectedRole] = useState('Technical Manager');
-  const [email, setEmail] = useState(ROLE_CREDENTIALS['Technical Manager'].email);
-  const [password, setPassword] = useState(ROLE_CREDENTIALS['Technical Manager'].password);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -23,13 +23,11 @@ export default function LoginModal({ isOpen, onClose }) {
 
   const handleRoleSelect = (item) => {
     setSelectedRole(item.role);
-    setEmail(item.email);
-    setPassword(item.password);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const userEmail = email || activeRoleData.email;
+    const userEmail = email.trim();
 
     const validation = validateRoleCredentials(selectedRole, userEmail, password);
     if (!validation.valid) {
@@ -53,7 +51,7 @@ export default function LoginModal({ isOpen, onClose }) {
     await login(selectedRole, {
       id: activeRoleData.id,
       name: activeRoleData.name,
-      email: userEmail,
+      email: userEmail || activeRoleData.email,
       avatar: activeRoleData.avatar
     });
     onClose();
@@ -145,10 +143,10 @@ export default function LoginModal({ isOpen, onClose }) {
               <div className="relative">
                 <Mail size={16} className="absolute left-3 top-2.5 text-slate-400" />
                 <input
-                  type="email"
-                  value={email || activeRoleData.email}
+                  type="text"
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. officer@ntb.gov.in"
+                  placeholder="Enter Employee ID or Email (e.g. TM-201 or vk.jain@ntb.gov.in)"
                   className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[40px]"
                   required
                 />
